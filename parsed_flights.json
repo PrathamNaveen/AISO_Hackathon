@@ -1,0 +1,178 @@
+[
+  {
+    "airline": "Scandinavian Airlines",
+    "price": 1430,
+    "duration": "12h 55m",
+    "route": "AMS → CPH",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Copenhagen Airport",
+    "departure_time": "2025-11-09 10:30",
+    "arrival_time": "2025-11-09 11:50",
+    "carbon_emissions": {
+      "this_flight": 605000,
+      "typical_for_this_route": 463000,
+      "difference_percent": 31
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/SK.png"
+  },
+  {
+    "airline": "Delta",
+    "price": 2360,
+    "duration": "9h 55m",
+    "route": "AMS → ATL",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Hartsfield-Jackson Atlanta International Airport",
+    "departure_time": "2025-11-09 10:45",
+    "arrival_time": "2025-11-09 14:40",
+    "carbon_emissions": {
+      "this_flight": 399000,
+      "typical_for_this_route": 463000,
+      "difference_percent": -14
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png"
+  },
+  {
+    "airline": "KLM",
+    "price": 2361,
+    "duration": "9h 40m",
+    "route": "AMS → ATL",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Hartsfield-Jackson Atlanta International Airport",
+    "departure_time": "2025-11-09 09:55",
+    "arrival_time": "2025-11-09 13:35",
+    "carbon_emissions": {
+      "this_flight": 316000,
+      "typical_for_this_route": 463000,
+      "difference_percent": -32
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png"
+  },
+  {
+    "airline": "Icelandair",
+    "price": 1340,
+    "duration": "16h 14m",
+    "route": "AMS → KEF",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Keflavík International Airport",
+    "departure_time": "2025-11-09 12:55",
+    "arrival_time": "2025-11-09 15:25",
+    "carbon_emissions": {
+      "this_flight": 608000,
+      "typical_for_this_route": 463000,
+      "difference_percent": 31
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/FI.png"
+  },
+  {
+    "airline": "JetBlue",
+    "price": 1461,
+    "duration": "15h 29m",
+    "route": "AMS → BOS",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Boston Logan International Airport",
+    "departure_time": "2025-11-09 13:40",
+    "arrival_time": "2025-11-09 15:47",
+    "carbon_emissions": {
+      "this_flight": 700000,
+      "typical_for_this_route": 463000,
+      "difference_percent": 51
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/B6.png"
+  },
+  {
+    "airline": "KLM",
+    "price": 1783,
+    "duration": "12h 54m",
+    "route": "AMS → JFK",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "John F. Kennedy International Airport",
+    "departure_time": "2025-11-09 17:05",
+    "arrival_time": "2025-11-09 19:20",
+    "carbon_emissions": {
+      "this_flight": 341000,
+      "typical_for_this_route": 463000,
+      "difference_percent": -26
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png"
+  },
+  {
+    "airline": "British Airways",
+    "price": 1806,
+    "duration": "13h 20m",
+    "route": "AMS → LHR",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Heathrow Airport",
+    "departure_time": "2025-11-09 12:50",
+    "arrival_time": "2025-11-09 13:15",
+    "carbon_emissions": {
+      "this_flight": 522000,
+      "typical_for_this_route": 463000,
+      "difference_percent": 13
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png"
+  },
+  {
+    "airline": "Delta",
+    "price": 1887,
+    "duration": "15h 26m",
+    "route": "AMS → JFK",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "John F. Kennedy International Airport",
+    "departure_time": "2025-11-09 08:50",
+    "arrival_time": "2025-11-09 11:20",
+    "carbon_emissions": {
+      "this_flight": 483000,
+      "typical_for_this_route": 463000,
+      "difference_percent": 4
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png"
+  },
+  {
+    "airline": "Delta",
+    "price": 2061,
+    "duration": "13h 31m",
+    "route": "AMS → JFK",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "John F. Kennedy International Airport",
+    "departure_time": "2025-11-09 10:45",
+    "arrival_time": "2025-11-09 13:10",
+    "carbon_emissions": {
+      "this_flight": 468000,
+      "typical_for_this_route": 463000,
+      "difference_percent": 1
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png"
+  },
+  {
+    "airline": "Delta",
+    "price": 2360,
+    "duration": "9h 55m",
+    "route": "AMS → ATL",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Hartsfield-Jackson Atlanta International Airport",
+    "departure_time": "2025-11-09 13:00",
+    "arrival_time": "2025-11-09 16:55",
+    "carbon_emissions": {
+      "this_flight": 382000,
+      "typical_for_this_route": 463000,
+      "difference_percent": -17
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png"
+  },
+  {
+    "airline": "KLM",
+    "price": 2360,
+    "duration": "9h 40m",
+    "route": "AMS → ATL",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "Hartsfield-Jackson Atlanta International Airport",
+    "departure_time": "2025-11-09 17:05",
+    "arrival_time": "2025-11-09 20:45",
+    "carbon_emissions": {
+      "this_flight": 316000,
+      "typical_for_this_route": 463000,
+      "difference_percent": -32
+    },
+    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png"
+  }
+]
