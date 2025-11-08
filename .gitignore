@@ -45,4 +45,8 @@ Thumbs.db
 
 .env
 __pycache__/
+
 myenv/
+credentials.json
+token.json
+service_account_cred.json
