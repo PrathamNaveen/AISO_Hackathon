@@ -8,8 +8,8 @@ import os
 import random
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from fetch_flight_data import fetch_flight_data_from_api
-from message import fetch_flight_data_from_serpapi
+# from fetch_flight_data import fetch_flight_data_from_api
+from fetch_flight_data import fetch_flight_data_from_serpapi
 
 # Load environment
 load_dotenv()
@@ -87,16 +87,17 @@ class MessagesState(TypedDict):
 
 
 def start_node(state: MessagesState):
-    print("👋 Welcome! Let's find you the best flights.")
+    print("👋 Welcome! You have a new invitation to a trip.")
     return {
         "messages": [HumanMessage(content="Hi! I can help you find flights. Where are you flying from and to?")]
     }
 
 
 def get_user_preferences(state: MessagesState):
-    user_input = input("✈️ Enter your travel preferences (e.g., 'Delhi to Amsterdam next week, budget $500'): ")
-    return {"preferences_text": user_input}
-
+    location = "Mumbai"
+    date = "2025-12-25"
+    user_input = input(f"✈️ Are you flying to {location} in {date}? (yes/no):  ")
+    return {"confirmation_text": user_input}
 
 def rag_node(state):
     rag_data = fetch_from_rag(state["preferences_text"])
