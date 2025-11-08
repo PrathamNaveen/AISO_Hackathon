@@ -1,0 +1,8 @@
+torch
+transformers
+langgraph
+datasets
+numpy<2
+pandas
+matplotlib
+notebook
