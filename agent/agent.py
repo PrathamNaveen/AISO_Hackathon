@@ -6,6 +6,9 @@ from typing import TypedDict
 from dotenv import load_dotenv
 import os
 import random
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from fetch_flight_data import fetch_flight_data_from_api
 
 # Load environment
 load_dotenv()
@@ -28,15 +31,16 @@ def fetch_from_rag(user_query: str):
     }
 
 
-def fetch_flight_data(preferences: dict):
-    """Simulates fetching flight data from an API or DB."""
+def fetch_flight_data_wrapper(preferences: dict):
+    """Fetches real flight data from SerpAPI using the imported function."""
     print("✈️ Fetching flight data...")
-    dummy_flights = [
-        {"airline": "Emirates", "price": 480, "duration": "10h", "route": "DXB → AMS"},
-        {"airline": "Qatar Airways", "price": 450, "duration": "11h", "route": "DOH → AMS"},
-        {"airline": "Lufthansa", "price": 520, "duration": "9h", "route": "FRA → AMS"},
-        {"airline": "KLM", "price": 550, "duration": "8h", "route": "DEL → AMS"},
-    ]
+    # dummy_flights = [
+    #     {"airline": "Emirates", "price": 480, "duration": "10h", "route": "DXB → AMS"},
+    #     {"airline": "Qatar Airways", "price": 450, "duration": "11h", "route": "DOH → AMS"},
+    #     {"airline": "Lufthansa", "price": 520, "duration": "9h", "route": "FRA → AMS"},
+    #     {"airline": "KLM", "price": 550, "duration": "8h", "route": "DEL → AMS"},
+    # ]
+    dummy_flights = fetch_flight_data_from_api(preferences)  # fetch the flight data from the serpapi.com
     flights = [f for f in dummy_flights if f["price"] <= preferences.get("budget", 9999)]
     return sorted(flights, key=lambda f: f["price"])[:3]
 
@@ -78,7 +82,7 @@ def flight_data_node(state):
     rag_info = state.get("rag_data", {})
     user_text = state.get("preferences_text", "")
     combined_info = {**rag_info, "user_query": user_text}
-    flights = fetch_flight_data(combined_info)
+    flights = fetch_flight_data_from_api(combined_info)
     return {"flights": flights}
 
 

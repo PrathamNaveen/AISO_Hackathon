@@ -6,67 +6,130 @@ This script is used to fetch the flight data from the serpapi.com
 from serpapi import GoogleSearch
 import json
 from datetime import datetime, timedelta
+import os
 
-user_information = {
-  "date": "2025-12-10",
-  "location": "Amsterdam",
-  "departure_airport": "AMS",  # tbd
-  "destination": "Austin",
-  "arrival_airport": "AUS",  # tbd
-  "days": 10,
-  "budget": 1000
-}
 
-# convert the user_information to the params
-
-params = {
-  "engine": "google_flights",
-  "departure_id": user_information['departure_airport'],         # Amsterdam Schiphol
-  "arrival_id": user_information['arrival_airport'],           # New York JFK
-  "outbound_date": user_information['date'],
-  "return_date": (datetime.strptime(user_information['date'], '%Y-%m-%d') + timedelta(days=user_information['days'])).strftime('%Y-%m-%d'),
-  "currency": "EUR",  # tbd
-  "hl": "en",                    # language
-  "api_key": "f20ff35e3dde89cba464ae5423dd93fb2a2aaecb6a41acf98fc3d9858906b6ef"
-}
-# print the params
-print(params)
-# parse the results to get the flight data
-# # load the results from the json file
-
-# # search the flight data
-# search = GoogleSearch(params)
-# results = search.get_dict()
-# flight_data = results
-
-with open('flight_data.json', 'r') as f:
-    results = json.load(f)
-flight_data = results
-
-# pick top 3 flights, with information: airline, airport, price, duration, departure_time, arrival_time
-top_3_flights_raw = flight_data['best_flights'][:3]
-
-# Extract and format the flight information
-top_3_flights = []
-for flight in top_3_flights_raw:
-    # Get the first flight segment (main outbound flight)
-    first_segment = flight['flights'][0]
+def fetch_flight_data_from_api(preferences=None):
+    """
+    Fetch top 3 flight data from SerpAPI or cached JSON file.
     
-    flight_info = {
-        "airline": first_segment['airline'],
-        "departure_airport": first_segment['departure_airport']['name'],
-        "arrival_airport": first_segment['arrival_airport']['name'],
-        "price": flight['price'],
-        "duration": flight['total_duration'],
-        "departure_time": first_segment['departure_airport']['time'],
-        "arrival_time": first_segment['arrival_airport']['time']
+    Args:
+        preferences (dict): User preferences including:
+            - departure_airport (str): Departure airport code
+            - arrival_airport (str): Arrival airport code
+            - date (str): Departure date in YYYY-MM-DD format
+            - days (int): Number of days for the trip
+            - budget (int): Maximum budget
+            - use_live_api (bool): Whether to use live API or cached data
+    
+    Returns:
+        list: Top 3 flights with airline, price, duration, and route information
+    """
+    # Default preferences
+    default_prefs = {
+        "date": "2025-12-25",
+        "departure_airport": "AMS",
+        "arrival_airport": "ATL",
+        "days": 10,
+        "budget": 1000,
+        "use_live_api": True
     }
-    top_3_flights.append(flight_info)
+    
+    # Merge with user preferences
+    if preferences:
+        default_prefs.update(preferences)
+    prefs = default_prefs
+    
+    # Get flight data (from cache or API)
+    if prefs.get("use_live_api", False):
+        flight_data = _fetch_from_api(prefs)
+    else:
+        flight_data = _load_from_cache()
+    
+    if not flight_data or 'best_flights' not in flight_data:
+        return []
+    
+    # Extract top 3 flights
+    flights_raw = flight_data['best_flights']
+    
+    # Format the flight information
+    all_flights = []
+    for flight in flights_raw:
+        # Get the first flight segment (main outbound flight)
+        first_segment = flight['flights'][0]
+        
+        # Convert duration from minutes to hours format
+        duration_minutes = flight['total_duration']
+        duration_hours = duration_minutes // 60
+        duration_mins = duration_minutes % 60
+        duration_str = f"{duration_hours}h {duration_mins}m" if duration_mins > 0 else f"{duration_hours}h"
+        
+        # Create route string
+        dep_code = first_segment['departure_airport']['id']
+        arr_code = first_segment['arrival_airport']['id']
+        route = f"{dep_code} → {arr_code}"
+        
+        flight_info = {
+            "airline": first_segment['airline'],
+            "price": flight['price'],
+            "duration": duration_str,
+            "route": route,
+            "departure_airport": first_segment['departure_airport']['name'],
+            "arrival_airport": first_segment['arrival_airport']['name'],
+            "departure_time": first_segment['departure_airport']['time'],
+            "arrival_time": first_segment['arrival_airport']['time']
+        }
+        all_flights.append(flight_info)
+    
+    return all_flights
 
-# Convert to JSON and print
-top_3_flights_json = json.dumps(top_3_flights, indent=2)
-print(top_3_flights_json)
 
-# # Optionally save to a file
-# with open('top_3_flights.json', 'w') as f:
-#     json.dump(top_3_flights, f, indent=2)
+def _fetch_from_api(preferences):
+    """Fetch flight data from SerpAPI (live API call)"""
+    params = {
+        "engine": "google_flights",
+        "departure_id": preferences['departure_airport'],
+        "arrival_id": preferences['arrival_airport'],
+        "outbound_date": preferences['date'],
+        "return_date": (datetime.strptime(preferences['date'], '%Y-%m-%d') + 
+                       timedelta(days=preferences['days'])).strftime('%Y-%m-%d'),
+        "currency": "EUR",
+        "hl": "en",
+        "api_key": os.getenv("SERPAPI_KEY", "f20ff35e3dde89cba464ae5423dd93fb2a2aaecb6a41acf98fc3d9858906b6ef")
+    }
+    
+    try:
+        search = GoogleSearch(params)
+        results = search.get_dict()
+        return results
+    except Exception as e:
+        print(f"❌ Error fetching from API: {e}")
+        return _load_from_cache()
+
+
+def _load_from_cache():
+    """Load flight data from cached JSON file"""
+    cache_file = os.path.join(os.path.dirname(__file__), 'flight_data.json')
+    try:
+        with open(cache_file, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"❌ Cache file not found: {cache_file}")
+        return None
+
+
+# For testing when run directly
+if __name__ == "__main__":
+    print("🔍 Testing flight data fetching...\n")
+    
+    # Test with default preferences
+    flights = fetch_flight_data_from_api()
+    
+    print("✈️ Top 3 Flights:")
+    # print(json.dumps(flights, indent=2))
+    
+    
+    # Optionally save to a file
+    # with open('top_3_flights.json', 'w') as f:
+    #     json.dump(flights, f, indent=2)
+    # print("\n✅ Saved to top_3_flights.json")

@@ -2,6 +2,9 @@
 torch
 transformers
 langgraph
+langchain
+langchain-openai
+python-dotenv
 datasets
 numpy<2
 pandas
