@@ -84,3 +84,4 @@ myenv/
 credentials.json
 token.json
 service_account_cred.json
+flight_data.json

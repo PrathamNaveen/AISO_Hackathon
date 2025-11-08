@@ -10,12 +10,13 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_flight_data import fetch_flight_data_from_api
 from message import fetch_flight_data_from_serpapi
+import json
+
 
 # Load environment
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 print("🔑 OpenAI API Key Loaded:", bool(OPENAI_API_KEY))
-
 
 # -------------------------------
 # Dummy functions (replace later)
@@ -74,7 +75,7 @@ def fetch_flight_data_wrapper(preferences: dict):
 # LangGraph Nodes
 # -------------------------------
 
-llm = ChatOpenAI(model="gpt-5", temperature=0.3)
+llm = ChatOpenAI(model="gpt-5", temperature=0.3, base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")
 
 class MessagesState(TypedDict):
     """State to hold messages and intermediate data."""
@@ -112,8 +113,88 @@ def flight_data_node(state):
 
 
 def compute_best_flight(state):
-    best = random.choice(state["flights"]) if state.get("flights") else None
-    return {"best_flight": best}
+    """Use LLM to analyze flights and return the best flight with reasoning."""
+    flights = state.get("flights", [])
+    if not flights:
+        print("❌ No flight data found for comparison.")
+        return {"best_flight": None}
+    
+    user_prefs = state.get("preferences_text", "")
+    rag_data = state.get("rag_data", {})
+    
+    # Summarize flights for LLM
+    flights_text = "\n".join([
+        f"{i+1}. Airline: {f.get('airline', 'N/A')}, "
+        f"Price: ${f.get('price', 'N/A')}, "
+        f"Duration: {f.get('duration', 'N/A')}, "
+        f"Route: {f.get('route', 'N/A')}"
+        for i, f in enumerate(flights)
+    ])
+    
+    prompt = f"""
+You are a smart travel assistant. Based on the user's preferences and available flights,
+pick the single best flight option that fits them best.
+
+User preferences: {user_prefs}
+RAG data (preferences): {rag_data}
+
+Available flights:
+{flights_text}
+
+Analyze price, airline, duration, and route according to the user's preferences.
+Return ONLY valid JSON (no markdown, no extra text) with this exact structure:
+{{
+    "airline": "<airline_name>",
+    "price": <price_in_number>,
+    "duration": "<duration>",
+    "route": "<route>",
+    "reason": "<why this flight is best for the user>"
+}}
+"""
+    
+    try:
+        # Make LLM call
+        response = llm.invoke([HumanMessage(content=prompt)]).content
+        print(f"🤖 Raw LLM Response:\n{response}\n")
+        
+        # Clean response (remove markdown code blocks if present)
+        import re
+        
+        # Remove markdown code blocks
+        cleaned = re.sub(r'```json\s*|\s*```', '', response).strip()
+        
+        # Parse JSON
+        best_flight = json.loads(cleaned)
+        
+        print(f"✅ LLM chose: {best_flight.get('airline', 'Unknown')} (${best_flight.get('price', 'N/A')})")
+        print(f"🧠 Reason: {best_flight.get('reason', 'No reason given')}")
+        
+        return {"best_flight": best_flight}
+        
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parsing error: {e}")
+        print(f"Raw LLM Output:\n{response}")
+        # Fallback: pick cheapest
+        best_flight = sorted(flights, key=lambda f: f.get("price", float('inf')))[0]
+        best_flight["reason"] = "Fallback: Cheapest option (LLM parsing failed)"
+        return {"best_flight": best_flight}
+        
+    except Exception as e:
+        print(f"❌ Error calling LLM: {type(e).__name__}: {e}")
+        
+        # Check if it's an auth error
+        if "authentication" in str(e).lower() or "api key" in str(e).lower():
+            print("🔑 API Key issue detected. Check your OPENAI_API_KEY in .env file")
+            print("   Visit: https://platform.openai.com/api-keys")
+        
+        # Fallback: pick cheapest
+        if flights:
+            best_flight = sorted(flights, key=lambda f: f.get("price", float('inf')))[0]
+            best_flight["reason"] = f"Fallback: Cheapest option (Error: {str(e)[:50]})"
+            return {"best_flight": best_flight}
+        else:
+            return {"best_flight": None}
+
 
 
 def display_flights(state):
