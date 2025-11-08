@@ -1,0 +1,29 @@
+[
+  {
+    "airline": "Delta",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "John F. Kennedy International Airport",
+    "price": 1036,
+    "duration": 515,
+    "departure_time": "2025-12-10 08:55",
+    "arrival_time": "2025-12-10 11:30"
+  },
+  {
+    "airline": "Delta",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "John F. Kennedy International Airport",
+    "price": 1036,
+    "duration": 510,
+    "departure_time": "2025-12-10 10:45",
+    "arrival_time": "2025-12-10 13:15"
+  },
+  {
+    "airline": "KLM",
+    "departure_airport": "Amsterdam Airport Schiphol",
+    "arrival_airport": "John F. Kennedy International Airport",
+    "price": 1036,
+    "duration": 495,
+    "departure_time": "2025-12-10 13:30",
+    "arrival_time": "2025-12-10 15:45"
+  }
+]
