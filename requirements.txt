@@ -1,3 +1,18 @@
+# ML and Data Processing
+torch
+transformers
+langgraph
+langchain
+langchain-openai
+python-dotenv
+datasets
+numpy<2
+pandas
+matplotlib
+notebook
+serpapi
+
+# Web Framework (FastAPI)
 annotated-doc==0.0.3
 annotated-types==0.7.0
 anyio==4.10.0

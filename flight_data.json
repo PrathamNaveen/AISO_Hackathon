@@ -1,0 +1,943 @@
+{    "best_flights": [
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 08:50"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 11:20"
+                    },
+                    "duration": 510,
+                    "airplane": "Airbus A330",
+                    "airline": "Delta",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "DL 47",
+                    "ticket_also_sold_by": [
+                        "Virgin Atlantic",
+                        "Air France",
+                        "KLM"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 325 kg"
+                    ]
+                }
+            ],
+            "total_duration": 510,
+            "carbon_emissions": {
+                "this_flight": 326000,
+                "typical_for_this_route": 386000,
+                "difference_percent": -16
+            },
+            "price": 1336,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ1JFVERRM0dnc0kySk1JRUFJYUExVlRSRGdjY05pVENBPT0iLFtbIkFNUyIsIjIwMjUtMTEtMDkiLCJKRksiLG51bGwsIkRMIiwiNDciXV1d"
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 10:45"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 13:10"
+                    },
+                    "duration": 505,
+                    "airplane": "Airbus A330-900neo",
+                    "airline": "Delta",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "DL 49",
+                    "ticket_also_sold_by": [
+                        "Virgin Atlantic",
+                        "Air France",
+                        "KLM"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 310 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                }
+            ],
+            "total_duration": 505,
+            "carbon_emissions": {
+                "this_flight": 311000,
+                "typical_for_this_route": 386000,
+                "difference_percent": -19
+            },
+            "price": 1336,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ1JFVERRNUdnc0kySk1JRUFJYUExVlRSRGdjY05pVENBPT0iLFtbIkFNUyIsIjIwMjUtMTEtMDkiLCJKRksiLG51bGwsIkRMIiwiNDkiXV1d"
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 13:40"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 15:45"
+                    },
+                    "duration": 485,
+                    "airplane": "Boeing 787-10",
+                    "airline": "KLM",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "KL 641",
+                    "ticket_also_sold_by": [
+                        "Delta"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 241 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                }
+            ],
+            "total_duration": 485,
+            "carbon_emissions": {
+                "this_flight": 241000,
+                "typical_for_this_route": 386000,
+                "difference_percent": -38
+            },
+            "price": 1341,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ1ZMVERZME1Sb0xDUDJXQ0JBQ0dnTlZVMFE0SEhEOWxnZz0iLFtbIkFNUyIsIjIwMjUtMTEtMDkiLCJKRksiLG51bGwsIktMIiwiNjQxIl1dXQ=="
+        }
+    ],
+    "other_flights": [
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 17:55"
+                    },
+                    "arrival_airport": {
+                        "name": "Leonardo da Vinci International Airport",
+                        "id": "FCO",
+                        "time": "2025-11-09 20:10"
+                    },
+                    "duration": 135,
+                    "airplane": "Airbus A320neo",
+                    "airline": "ITA",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AZ.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AZ 109",
+                    "legroom": "29 in",
+                    "extensions": [
+                        "Below average legroom (29 in)",
+                        "In-seat USB outlet",
+                        "Stream media to your device",
+                        "Carbon emissions estimate: 101 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                },
+                {
+                    "departure_airport": {
+                        "name": "Leonardo da Vinci International Airport",
+                        "id": "FCO",
+                        "time": "2025-11-10 14:55"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-10 18:55"
+                    },
+                    "duration": 600,
+                    "airplane": "Airbus A330-900neo",
+                    "airline": "ITA",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AZ.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AZ 610",
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 297 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 1125,
+                    "name": "Leonardo da Vinci International Airport",
+                    "id": "FCO",
+                    "overnight": true
+                }
+            ],
+            "total_duration": 1860,
+            "carbon_emissions": {
+                "this_flight": 399000,
+                "typical_for_this_route": 386000,
+                "difference_percent": 3
+            },
+            "price": 699,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AZ.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ3RCV2pFd09YeEJXall4TUJvTENPS2hCQkFDR2dOVlUwUTRISERpb1FRPSIsW1siQU1TIiwiMjAyNS0xMS0wOSIsIkZDTyIsbnVsbCwiQVoiLCIxMDkiXSxbIkZDTyIsIjIwMjUtMTEtMTAiLCJKRksiLG51bGwsIkFaIiwiNjEwIl1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 11:55"
+                    },
+                    "arrival_airport": {
+                        "name": "Leonardo da Vinci International Airport",
+                        "id": "FCO",
+                        "time": "2025-11-09 14:10"
+                    },
+                    "duration": 135,
+                    "airplane": "Airbus A321neo",
+                    "airline": "ITA",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AZ.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AZ 107",
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 126 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Leonardo da Vinci International Airport",
+                        "id": "FCO",
+                        "time": "2025-11-09 14:55"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 18:55"
+                    },
+                    "duration": 600,
+                    "airplane": "Airbus A330-900neo",
+                    "airline": "ITA",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AZ.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AZ 610",
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 297 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 45,
+                    "name": "Leonardo da Vinci International Airport",
+                    "id": "FCO"
+                }
+            ],
+            "total_duration": 780,
+            "carbon_emissions": {
+                "this_flight": 424000,
+                "typical_for_this_route": 386000,
+                "difference_percent": 10
+            },
+            "price": 896,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AZ.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ3RCV2pFd04zeEJXall4TUJvTENMYTdCUkFDR2dOVlUwUTRISEMydXdVPSIsW1siQU1TIiwiMjAyNS0xMS0wOSIsIkZDTyIsbnVsbCwiQVoiLCIxMDciXSxbIkZDTyIsIjIwMjUtMTEtMDkiLCJKRksiLG51bGwsIkFaIiwiNjEwIl1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 17:15"
+                    },
+                    "arrival_airport": {
+                        "name": "Casablanca Mohammed V International Airport",
+                        "id": "CMN",
+                        "time": "2025-11-09 20:45"
+                    },
+                    "duration": 210,
+                    "airplane": "Boeing 737",
+                    "airline": "Royal Air Maroc",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AT.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AT 851",
+                    "legroom": "32 in",
+                    "extensions": [
+                        "Above average legroom (32 in)",
+                        "Carbon emissions estimate: 210 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                },
+                {
+                    "departure_airport": {
+                        "name": "Casablanca Mohammed V International Airport",
+                        "id": "CMN",
+                        "time": "2025-11-10 15:50"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-10 17:55"
+                    },
+                    "duration": 485,
+                    "airplane": "Boeing 787",
+                    "airline": "Royal Air Maroc",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AT.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AT 200",
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 332 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 1145,
+                    "name": "Casablanca Mohammed V International Airport",
+                    "id": "CMN",
+                    "overnight": true
+                }
+            ],
+            "total_duration": 1840,
+            "carbon_emissions": {
+                "this_flight": 544000,
+                "typical_for_this_route": 386000,
+                "difference_percent": 41
+            },
+            "price": 1152,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AT.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ3RCVkRnMU1YeEJWREl3TUJvTENQV0RCeEFDR2dOVlUwUTRISEQxZ3djPSIsW1siQU1TIiwiMjAyNS0xMS0wOSIsIkNNTiIsbnVsbCwiQVQiLCI4NTEiXSxbIkNNTiIsIjIwMjUtMTEtMTAiLCJKRksiLG51bGwsIkFUIiwiMjAwIl1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 10:30"
+                    },
+                    "arrival_airport": {
+                        "name": "Copenhagen Airport",
+                        "id": "CPH",
+                        "time": "2025-11-09 11:50"
+                    },
+                    "duration": 80,
+                    "airplane": "Airbus A320neo",
+                    "airline": "Scandinavian Airlines",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/SK.png",
+                    "travel_class": "Economy",
+                    "flight_number": "SK 552",
+                    "legroom": "29 in",
+                    "extensions": [
+                        "Below average legroom (29 in)",
+                        "In-seat USB outlet",
+                        "Carbon emissions estimate: 67 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                },
+                {
+                    "departure_airport": {
+                        "name": "Copenhagen Airport",
+                        "id": "CPH",
+                        "time": "2025-11-09 12:55"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 15:45"
+                    },
+                    "duration": 530,
+                    "airplane": "Airbus A330",
+                    "airline": "Scandinavian Airlines",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/SK.png",
+                    "travel_class": "Economy",
+                    "flight_number": "SK 915",
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 441 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 65,
+                    "name": "Copenhagen Airport",
+                    "id": "CPH"
+                }
+            ],
+            "total_duration": 675,
+            "carbon_emissions": {
+                "this_flight": 509000,
+                "typical_for_this_route": 386000,
+                "difference_percent": 32
+            },
+            "price": 1186,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/SK.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ3RUU3pVMU1ueFRTemt4TlJvTENMT2VCeEFDR2dOVlUwUTRISEN6bmdjPSIsW1siQU1TIiwiMjAyNS0xMS0wOSIsIkNQSCIsbnVsbCwiU0siLCI1NTIiXSxbIkNQSCIsIjIwMjUtMTEtMDkiLCJKRksiLG51bGwsIlNLIiwiOTE1Il1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 07:05"
+                    },
+                    "arrival_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2025-11-09 07:30"
+                    },
+                    "duration": 85,
+                    "airplane": "Airbus A320",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 449",
+                    "ticket_also_sold_by": [
+                        "American"
+                    ],
+                    "legroom": "29 in",
+                    "extensions": [
+                        "Below average legroom (29 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "Carbon emissions estimate: 46 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2025-11-09 09:35"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 12:35"
+                    },
+                    "duration": 480,
+                    "airplane": "Boeing 777",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 175",
+                    "ticket_also_sold_by": [
+                        "American",
+                        "Finnair"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 293 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 125,
+                    "name": "Heathrow Airport",
+                    "id": "LHR"
+                }
+            ],
+            "total_duration": 690,
+            "carbon_emissions": {
+                "this_flight": 340000,
+                "typical_for_this_route": 386000,
+                "difference_percent": -12
+            },
+            "price": 1330,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ3RDUVRRME9YeENRVEUzTlJvTENPS09DQkFDR2dOVlUwUTRISERpamdnPSIsW1siQU1TIiwiMjAyNS0xMS0wOSIsIkxIUiIsbnVsbCwiQkEiLCI0NDkiXSxbIkxIUiIsIjIwMjUtMTEtMDkiLCJKRksiLG51bGwsIkJBIiwiMTc1Il1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 17:05"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 19:20"
+                    },
+                    "duration": 495,
+                    "airplane": "Boeing 787-10",
+                    "airline": "KLM",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "KL 643",
+                    "ticket_also_sold_by": [
+                        "Delta"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 241 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                }
+            ],
+            "total_duration": 495,
+            "carbon_emissions": {
+                "this_flight": 241000,
+                "typical_for_this_route": 386000,
+                "difference_percent": -38
+            },
+            "price": 1341,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ1ZMVERZME14b0xDUDJXQ0JBQ0dnTlZVMFE0SEhEOWxnZz0iLFtbIkFNUyIsIjIwMjUtMTEtMDkiLCJKRksiLG51bGwsIktMIiwiNjQzIl1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Amsterdam Airport Schiphol",
+                        "id": "AMS",
+                        "time": "2025-11-09 14:00"
+                    },
+                    "arrival_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2025-11-09 15:20"
+                    },
+                    "duration": 80,
+                    "airplane": "Airbus A220-300 Passenger",
+                    "airline": "Air France",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AF.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AF 1641",
+                    "ticket_also_sold_by": [
+                        "KLM"
+                    ],
+                    "legroom": "30 in",
+                    "extensions": [
+                        "Average legroom (30 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "Carbon emissions estimate: 60 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2025-11-09 16:30"
+                    },
+                    "arrival_airport": {
+                        "name": "John F. Kennedy International Airport",
+                        "id": "JFK",
+                        "time": "2025-11-09 19:05"
+                    },
+                    "duration": 515,
+                    "airplane": "Boeing 777",
+                    "airline": "Air France",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AF.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AF 8",
+                    "ticket_also_sold_by": [
+                        "KLM"
+                    ],
+                    "legroom": "32 in",
+                    "extensions": [
+                        "Above average legroom (32 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 361 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 70,
+                    "name": "Paris Charles de Gaulle Airport",
+                    "id": "CDG"
+                }
+            ],
+            "total_duration": 665,
+            "carbon_emissions": {
+                "this_flight": 422000,
+                "typical_for_this_route": 386000,
+                "difference_percent": 9
+            },
+            "price": 1351,
+            "type": "Round trip",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AF.png",
+            "departure_token": "WyJDalJJTlVvNE9TMVdTMUpIWlZsQlNVOW9TbEZDUnkwdExTMHRMUzB0ZG5kaVpIY3hOVUZCUVVGQlIydFFaa05aUm1Sc1UyOUJFZ3BCUmpFMk5ERjhRVVk0R2dzSTdwNElFQUlhQTFWVFJEZ2NjTzZlQ0E9PSIsW1siQU1TIiwiMjAyNS0xMS0wOSIsIkNERyIsbnVsbCwiQUYiLCIxNjQxIl0sWyJDREciLCIyMDI1LTExLTA5IiwiSkZLIixudWxsLCJBRiIsIjgiXV1d"
+        }
+    ],
+    "price_insights": {
+        "lowest_price": 699,
+        "price_level": "high",
+        "typical_price_range": [
+            510,
+            670
+        ],
+        "price_history": [
+            [
+                1757368800,
+                555
+            ],
+            [
+                1757455200,
+                558
+            ],
+            [
+                1757541600,
+                555
+            ],
+            [
+                1757628000,
+                555
+            ],
+            [
+                1757714400,
+                556
+            ],
+            [
+                1757800800,
+                556
+            ],
+            [
+                1757887200,
+                556
+            ],
+            [
+                1757973600,
+                556
+            ],
+            [
+                1758060000,
+                557
+            ],
+            [
+                1758146400,
+                557
+            ],
+            [
+                1758232800,
+                555
+            ],
+            [
+                1758319200,
+                553
+            ],
+            [
+                1758405600,
+                552
+            ],
+            [
+                1758492000,
+                552
+            ],
+            [
+                1758578400,
+                551
+            ],
+            [
+                1758664800,
+                554
+            ],
+            [
+                1758751200,
+                524
+            ],
+            [
+                1758837600,
+                521
+            ],
+            [
+                1758924000,
+                517
+            ],
+            [
+                1759010400,
+                519
+            ],
+            [
+                1759096800,
+                520
+            ],
+            [
+                1759183200,
+                520
+            ],
+            [
+                1759269600,
+                551
+            ],
+            [
+                1759356000,
+                598
+            ],
+            [
+                1759442400,
+                604
+            ],
+            [
+                1759528800,
+                597
+            ],
+            [
+                1759615200,
+                598
+            ],
+            [
+                1759701600,
+                598
+            ],
+            [
+                1759788000,
+                574
+            ],
+            [
+                1759874400,
+                574
+            ],
+            [
+                1759960800,
+                594
+            ],
+            [
+                1760047200,
+                592
+            ],
+            [
+                1760133600,
+                590
+            ],
+            [
+                1760220000,
+                593
+            ],
+            [
+                1760306400,
+                593
+            ],
+            [
+                1760392800,
+                603
+            ],
+            [
+                1760479200,
+                597
+            ],
+            [
+                1760565600,
+                603
+            ],
+            [
+                1760652000,
+                603
+            ],
+            [
+                1760738400,
+                606
+            ],
+            [
+                1760824800,
+                606
+            ],
+            [
+                1760911200,
+                641
+            ],
+            [
+                1760997600,
+                640
+            ],
+            [
+                1761084000,
+                638
+            ],
+            [
+                1761170400,
+                604
+            ],
+            [
+                1761256800,
+                663
+            ],
+            [
+                1761343200,
+                663
+            ],
+            [
+                1761429600,
+                663
+            ],
+            [
+                1761519600,
+                640
+            ],
+            [
+                1761606000,
+                665
+            ],
+            [
+                1761692400,
+                744
+            ],
+            [
+                1761778800,
+                760
+            ],
+            [
+                1761865200,
+                757
+            ],
+            [
+                1761951600,
+                773
+            ],
+            [
+                1762038000,
+                768
+            ],
+            [
+                1762124400,
+                810
+            ],
+            [
+                1762210800,
+                742
+            ],
+            [
+                1762297200,
+                740
+            ],
+            [
+                1762383600,
+                740
+            ],
+            [
+                1762470000,
+                698
+            ],
+            [
+                1762556400,
+                699
+            ]
+        ]
+    },
+    "airports": [
+        {
+            "departure": [
+                {
+                    "airport": {
+                        "id": "AMS",
+                        "name": "Amsterdam Airport Schiphol"
+                    },
+                    "city": "Amsterdam",
+                    "country": "Netherlands",
+                    "country_code": "NL",
+                    "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRTHETZVxU4_OrKq24sf7n7HS_0ca3__1_Urs251dzMXLn16tZy8J8x5i1phGimLkrbGL2gDKGrA-U35g",
+                    "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRiH-EGCc5jbyYbopiqf-g80xO0O5pxPnlJESLyIsY2uvo-gB84S94Q4C9kNWoKQ_eQ3OU-6evapBnb7TquB4zg3p3fQEGA3wpbxxhRdx0"
+                }
+            ],
+            "arrival": [
+                {
+                    "airport": {
+                        "id": "JFK",
+                        "name": "John F. Kennedy International Airport"
+                    },
+                    "city": "New York",
+                    "country": "United States",
+                    "country_code": "US",
+                    "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRa1dwH1NZQk4dsbPiyA9Vrq2RX75jXSZ-OkHn7NkLHl-11HercqDXoZ4p2cDxJkH6vca2degawrCzHEQ",
+                    "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQEaUa9NsdPWGpAUGkTApkZDT_4M6_6V8wTcC0v1b1wJAJX-BuMSiipXbsoznGgcI1xLOc5QiTcR_xovexgjdOz0gqQe0tRQ9h0bUkZ07Q"
+                }
+            ]
+        },
+        {
+            "departure": [
+                {
+                    "airport": {
+                        "id": "JFK",
+                        "name": "John F. Kennedy International Airport"
+                    },
+                    "city": "New York",
+                    "country": "United States",
+                    "country_code": "US",
+                    "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRa1dwH1NZQk4dsbPiyA9Vrq2RX75jXSZ-OkHn7NkLHl-11HercqDXoZ4p2cDxJkH6vca2degawrCzHEQ",
+                    "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQEaUa9NsdPWGpAUGkTApkZDT_4M6_6V8wTcC0v1b1wJAJX-BuMSiipXbsoznGgcI1xLOc5QiTcR_xovexgjdOz0gqQe0tRQ9h0bUkZ07Q"
+                }
+            ],
+            "arrival": [
+                {
+                    "airport": {
+                        "id": "AMS",
+                        "name": "Amsterdam Airport Schiphol"
+                    },
+                    "city": "Amsterdam",
+                    "country": "Netherlands",
+                    "country_code": "NL",
+                    "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRTHETZVxU4_OrKq24sf7n7HS_0ca3__1_Urs251dzMXLn16tZy8J8x5i1phGimLkrbGL2gDKGrA-U35g",
+                    "thumbnail": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRiH-EGCc5jbyYbopiqf-g80xO0O5pxPnlJESLyIsY2uvo-gB84S94Q4C9kNWoKQ_eQ3OU-6evapBnb7TquB4zg3p3fQEGA3wpbxxhRdx0"
+                }
+            ]
+        }
+    ]
+}
