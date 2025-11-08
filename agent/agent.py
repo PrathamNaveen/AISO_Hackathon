@@ -9,6 +9,7 @@ import random
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_flight_data import fetch_flight_data_from_api
+from message import fetch_flight_data_from_serpapi
 
 # Load environment
 load_dotenv()
@@ -34,15 +35,39 @@ def fetch_from_rag(user_query: str):
 def fetch_flight_data_wrapper(preferences: dict):
     """Fetches real flight data from SerpAPI using the imported function."""
     print("✈️ Fetching flight data...")
-    # dummy_flights = [
-    #     {"airline": "Emirates", "price": 480, "duration": "10h", "route": "DXB → AMS"},
-    #     {"airline": "Qatar Airways", "price": 450, "duration": "11h", "route": "DOH → AMS"},
-    #     {"airline": "Lufthansa", "price": 520, "duration": "9h", "route": "FRA → AMS"},
-    #     {"airline": "KLM", "price": 550, "duration": "8h", "route": "DEL → AMS"},
-    # ]
-    dummy_flights = fetch_flight_data_from_api(preferences)  # fetch the flight data from the serpapi.com
-    flights = [f for f in dummy_flights if f["price"] <= preferences.get("budget", 9999)]
-    return sorted(flights, key=lambda f: f["price"])[:3]
+    
+    from datetime import datetime, timedelta
+    
+    # Extract parameters from preferences dict
+    departure_id = preferences.get("departure_airport", "AMS")
+    arrival_id = preferences.get("arrival_airport", "ATL")
+    outbound_date = preferences.get("date", "2025-12-25")
+    days = preferences.get("days", 10)
+    
+    # Calculate return date
+    try:
+        return_date = (datetime.strptime(outbound_date, '%Y-%m-%d') + 
+                      timedelta(days=days)).strftime('%Y-%m-%d')
+    except:
+        return_date = "2026-01-04"  # fallback
+    
+    currency = preferences.get("currency", "USD")
+    budget = preferences.get("budget", 9999)
+    
+    # Fetch parsed flight data from SerpAPI
+    all_flights = fetch_flight_data_from_serpapi(
+        departure_id=departure_id,
+        arrival_id=arrival_id,
+        outbound_date=outbound_date,
+        return_date=return_date,
+        currency=currency,
+        sort_by=1,
+        parse_only_essentials=True
+    )
+    
+    # Filter by budget and return top 3
+    filtered_flights = [f for f in all_flights if f["price"] <= budget]
+    return sorted(filtered_flights, key=lambda f: f["price"])[:3]
 
 
 # -------------------------------
@@ -82,7 +107,7 @@ def flight_data_node(state):
     rag_info = state.get("rag_data", {})
     user_text = state.get("preferences_text", "")
     combined_info = {**rag_info, "user_query": user_text}
-    flights = fetch_flight_data_from_api(combined_info)
+    flights = fetch_flight_data_from_serpapi()
     return {"flights": flights}
 
 
