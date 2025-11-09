@@ -3,29 +3,57 @@
 import React, { useState } from 'react';
 import EventsList from '../../components/EventList';
 import EssentialInfo from '../../components/EssentialInfo';
-import ReasoningPanel from '../../components/ReasoningPanel';
 import FlightSearchPanel from '../../components/FlightSearchPanel';
 import type { EventItem } from '../../types/api';
+
 export default function DashboardPage() {
   const [selected, setSelected] = useState<EventItem | null>(null);
   const [agentTaskId, setAgentTaskId] = useState<string | null>(null);
+  const [essentialOpen, setEssentialOpen] = useState<boolean>(false); // collapsed by default
+  const [leftOpen, setLeftOpen] = useState<boolean>(true); // left column collapsecollapsed by default
 
   return (
-    <div style={{ display: 'flex', height: '100vh', gap: 12 }}>
-      {/* Left column */}
-      <div style={{ width: 320, background: '#222', color: '#fff', overflow: 'auto', paddingTop: 12 }}>
-        <div style={{ padding: '0 12px' }}>
-          <h2>Meetings</h2>
+    <div className="flex h-screen">
+      <div className={`relative bg-[#222] text-white flex flex-col overflow-hidden transition-all duration-200 ${leftOpen ? 'w-80' : 'w-16'}`}>
+        {/* toggle button on the right edge of left column */}
+        <button
+          aria-label="Toggle left panel"
+          onClick={() => setLeftOpen((s) => !s)}
+          className="absolute right-3 top-4 z-10 w-6 h-6 bg-[#444] rounded-full flex items-center justify-center text-white shadow"
+        >
+          {leftOpen ? '<' : '>'}
+        </button>
+
+        <div className="px-3">
+          <h2 className={`text-[40px] font-semibold py-[10px] transition-opacity duration-200 ${leftOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>Meetings</h2>
         </div>
-        <EventsList onSelect={(e) => setSelected(e)} />
-        <div style={{ padding: 12 }}>
-          <button style={{ padding: '8px 12px', borderRadius: 12, background: '#444', color: '#fff' }}>Log out</button>
+
+        <div className="flex-1 px-3 overflow-auto">
+          <EventsList onSelect={(e) => setSelected(e)} />
+        </div>
+
+        <div className="p-3">
+          <button className="w-full px-3 py-2 rounded-xl bg-[#444] text-white">Log out</button>
         </div>
       </div>
 
-      {/* Middle column */}
-      <div style={{ flex: 1, background: '#3a3636', color: '#fff', overflow: 'auto' }}>
-        <div style={{ padding: 12 }}>
+      {/* Middle column (collapsible) */}
+      <div
+        className={`relative bg-[#353232]  text-white transition-all duration-200 flex flex-col ${
+          essentialOpen ? 'w-80' : 'w-16'
+        }`}
+      >
+        {/* toggle button on the left edge */}
+        <button
+          aria-label="Toggle essential panel"
+          onClick={() => setEssentialOpen((s) => !s)}
+          className="absolute right-3 top-4 z-10 w-6 h-6 bg-[#444] rounded-full flex items-center justify-center text-white shadow"
+        >
+          {essentialOpen ? '<' : '>'}
+        </button>
+
+        {/* content - hidden when collapsed */}
+        <div className={`${essentialOpen ? 'p-3 block' : 'hidden'}`}>
           <EssentialInfo
             meetingId={selected?.id ?? null}
             onConfirmed={(taskId) => {
@@ -33,31 +61,17 @@ export default function DashboardPage() {
             }}
           />
         </div>
-
-        <div style={{ padding: 12 }}>
-          <ReasoningPanel meetingId={selected?.id ?? null} />
-        </div>
       </div>
 
       {/* Right column */}
-      <div style={{ width: 520, background: '#f1f1f1', overflow: 'auto' }}>
-        <div style={{ padding: 12 }}>
-          <h2>Tell us more about your preference</h2>
-          {/* You can add a small chat or preference UI here */}
+      <div className="flex-1 bg-gray-100 overflow-auto">
+        <div className="p-3">
+          <h2 className="text-[30px] text-center font-semibold">Tell us more about your preference</h2>
         </div>
 
-        <div style={{ padding: 12 }}>
+        <div className="p-3">
           <FlightSearchPanel meetingId={selected?.id ?? null} />
         </div>
-
-        {/* <div style={{ padding: 12 }}>
-          <div style={{ background: '#ddd', padding: 12, borderRadius: 12 }}>
-            <h3>Confirm details</h3>
-            <button style={{ padding: '8px 12px', borderRadius: 8, background: '#3478f6', color: '#fff' }}>
-              Confirm
-            </button>
-          </div>
-        </div> */}
       </div>
     </div>
   );
