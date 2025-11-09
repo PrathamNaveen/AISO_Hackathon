@@ -2,11 +2,9 @@
 from fastapi import FastAPI, HTTPException, Depends, Cookie, Response, Path, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from importlib import import_module
-from pydantic import BaseModel, EmailStr,ConfigDict, Field
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta
-import jwt
-import os
 import json
 import traceback
 import uuid
@@ -15,6 +13,8 @@ from typing import Tuple
 
 from db import get_db_connection
 from dotenv import load_dotenv
+
+app = FastAPI()
 
 # Enable CORS for local frontend development. In prod, lock this down to your
 # real frontend origin or use an nginx reverse-proxy so services are same-origin.
@@ -108,8 +108,9 @@ _mock = {
             "processed": False,
         },
     ],
-    "essential": {
-        "evt_1": {
+    
+    "short_term": {
+        "essential": {
             "meetingId": "evt_1",
             "from": {"code": "JFK", "label": "John F. Kennedy (JFK)"},
             "to": {"code": "AMS", "label": "Amsterdam (AMS)"},
@@ -117,13 +118,7 @@ _mock = {
             "tripType": "round-trip",
             "stayRange": {"minDays": 2, "maxDays": 5},
             "arriveBeforeDays": {"min": 0, "max": 1},
-        }
     },
-    "short_term": {},
-    "reasoning": {
-        "evt_1": [
-            {"ts": "2025-11-09T00:00:00Z", "type": "step", "text": "Prefill origin detected: JFK", "meta": {"confidence": 0.92}}
-        ]
     },
     "searches": {},
     "bookings": {},
@@ -188,67 +183,21 @@ def get_events():
 
 
 @app.get("/api/meetings/{meeting_id}/essential")
-def get_essential(meeting_id: str):
-    # prefer short-term override then essential prefill
-    if meeting_id in _mock["short_term"]:
-        return _mock["short_term"][meeting_id]
-    if meeting_id in _mock["essential"]:
-        return _mock["essential"][meeting_id]
-    # fallback empty structure
-    return {
-        "meetingId": meeting_id,
-        "from": {"code": "AMS", "label": "Amsterdam (AMS)"},
-        "to": {"code": "JFK", "label": "John F. Kennedy (JFK)"},
-        "class": "economy",
-        "tripType": "round-trip",
-        "stayRange": {"minDays": 2, "maxDays": 7},
-        "arriveBeforeDays": {"min": 0, "max": 1},
-    }
+def get_essential():
+    essential = _mock.get("short_term", {}).get("essential")
+    if not essential:
+        raise HTTPException(status_code=404, detail="essential info not set")
+    return essential
+    
 
 
 @app.post("/api/meetings/{meeting_id}/essential/confirm", status_code=202)
 def confirm_essential(meeting_id: str, payload: Dict[str, Any], background_tasks: BackgroundTasks):
-    """Accepts a partial EssentialInfo payload, stores it in short-term memory and
-    triggers a mock background search task (synchronous here but returns a task id).
-    """
-    # save short-term memory
-    _mock["short_term"][meeting_id] = payload
+    _mock.setdefault("short_term", {})["essential"] = payload
 
-    # create a mock search task
+    # produce a task id to indicate the action was accepted (no background work here)
     task_id = _rand("task_")
-
-    # create candidate search result now (in real app this would be async)
-    candidates = []
-    if PARSED_FLIGHTS:
-        # take top N from parsed flights as mock candidates
-        for i, f in enumerate(PARSED_FLIGHTS[:3]):
-            candidates.append({
-                "id": f.get("airline", "f") + f"_{i}",
-                "price": f.get("price"),
-                "itinerary": f.get("route"),
-                "provider": f.get("airline"),
-                "details": f,
-            })
-    elif TOP_3_FLIGHTS:
-        for i, f in enumerate(TOP_3_FLIGHTS[:3]):
-            candidates.append({
-                "id": f"f_{i}",
-                "price": f.get("price"),
-                "itinerary": f.get("route"),
-                "provider": f.get("airline"),
-                "details": f,
-            })
-    else:
-        # very small deterministic fallback
-        candidates = [
-            {"id": _rand("f_"), "price": 999, "itinerary": "AMS → JFK non-stop", "provider": "MockAir", "details": {}},
-            {"id": _rand("f_"), "price": 1299, "itinerary": "AMS → JFK 1 stop", "provider": "MockAir", "details": {}},
-        ]
-
-    search_id = _rand("s_")
-    _mock["searches"][search_id] = {"searchId": search_id, "status": "completed", "candidates": candidates}
-
-    return {"taskId": search_id, "status": "queued"}
+    return {"taskId": task_id, "meetingId": meeting_id, "status": "accepted", "message": "Essential info updated"}
 
 
 @app.post("/api/flights/search")
@@ -302,6 +251,7 @@ def flights_search(body: Dict[str, Any]):
 
 @app.get("/api/agent/reasoning/{meeting_id}")
 def get_reasoning(meeting_id: str):
+    # TODO: recieve the result from the getflight, get the reason part
     log = _mock["reasoning"].get(meeting_id, [])
     return {"meetingId": meeting_id, "log": log}
 
@@ -419,3 +369,4 @@ def login(req: LoginRequest, response: Response):
 
     return {"message": "Login successful", "user": {"userid": user["userid"], "email": user["email"], "name": user["name"]}}
 
+    }

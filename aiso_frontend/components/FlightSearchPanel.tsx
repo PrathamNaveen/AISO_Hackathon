@@ -48,7 +48,7 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
       const payload = { meetingId, candidateId: candidate.id };
       const booking = await createBooking(payload);
       setBookingResult(booking);
-      push({ id: uid('a_'), role: 'agent', text: `Booking created: ${booking.confirmationNumber ?? booking.bookingId}` });
+      push({ id: uid('a_'), role: 'agent', text: `` });
       setSelected(null);
     } catch (err: any) {
       setError(String(err));
@@ -56,33 +56,33 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
   }
 
   return (
-    <div style={{ padding: 12, display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ marginBottom: 8 }}>
-        <h3 style={{ margin: 0 }}>Assistant (chat)</h3>
-        <div style={{ fontSize: 12, color: '#555' }}>Type preferences, then press send. Agent will return flight lists.</div>
+    <div className="p-3 flex flex-col h-full">
+      <div className="mb-2">
+        <h3 className="m-0 text-lg font-medium">Assistant (chat)</h3>
+        <div className="text-sm text-gray-500">Type preferences, then press send. Agent will return flight lists.</div>
       </div>
 
-      <div style={{ flex: 1, overflow: 'auto', padding: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {messages.length === 0 && <div style={{ color: '#888' }}>No messages yet. Ask to "find flights" or type preferences.</div>}
+      <div className="flex-1 overflow-auto p-2 flex flex-col gap-2">
+        {messages.length === 0 && <div className="text-gray-500">No messages yet. Ask to "find flights" or type preferences.</div>}
         {messages.map((m) => (
-          <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
-              <div style={{ background: m.role === 'user' ? '#3478f6' : '#eee', color: m.role === 'user' ? '#fff' : '#111', padding: 10, borderRadius: 8 }}>
-                <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
+          <div key={m.id} className="flex flex-col gap-2">
+            <div className={`${m.role === 'user' ? 'self-end' : 'self-start'} max-w-[80%]`}>
+              <div className={`${m.role === 'user' ? 'bg-[#8D0101] text-white' : 'bg-gray-100 text-black'} p-3 rounded-lg whitespace-pre-wrap`}>
+                <div>{m.text}</div>
               </div>
             </div>
 
             {m.candidates && m.candidates.length > 0 && (
-              <div style={{ display: 'grid', gap: 8, marginTop: 6 }}>
+              <div className="grid gap-2 mt-2">
                 {m.candidates.map((c) => (
-                  <div key={c.id} style={{ background: '#222', color: '#fff', padding: 10, borderRadius: 8 }}>
-                    <div style={{ fontWeight: 700 }}>{c.itinerary}</div>
-                    <div style={{ fontSize: 13 }}>Provider: {c.provider ?? '—'}</div>
-                    <div style={{ fontSize: 13 }}>Price: ${c.price?.toFixed(2)}</div>
-                    <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
+                  <div key={c.id} className="bg-[#222] text-white p-3 rounded-lg">
+                    <div className="font-semibold">{c.itinerary}</div>
+                    <div className="text-sm">Provider: {c.provider ?? '—'}</div>
+                    <div className="text-sm">Price: ${c.price?.toFixed(2)}</div>
+                    <div className="mt-3 flex gap-2">
                       <button
                         onClick={() => setSelected(c)}
-                        style={{ padding: '6px 10px', borderRadius: 8, background: '#ff8c00', color: '#fff', border: 'none' }}
+                        className="px-3 py-2 rounded-md bg-[#8D0101] hover:bg-orange-600 text-white"
                       >
                         Book this
                       </button>
@@ -96,34 +96,39 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
       </div>
 
       {selected && (
-        <div style={{ marginTop: 8, background: '#fff', padding: 12, borderRadius: 8 }}>
-          <div style={{ fontWeight: 700 }}>{selected.itinerary}</div>
+        <div className="mt-2 bg-white p-3 rounded-lg shadow">
+          <div className="font-semibold">{selected.itinerary}</div>
           <div>Price: ${selected.price?.toFixed(2)}</div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            <button onClick={() => handleConfirmBooking(selected)} style={{ padding: '8px 12px', borderRadius: 8, background: '#0b6eff', color: '#fff', border: 'none' }}>
+          <div className="flex gap-2 mt-3">
+            <button onClick={() => handleConfirmBooking(selected)} className="px-3 py-2 rounded-md bg-[#8D0101] text-white">
               Confirm booking
             </button>
-            <button onClick={() => setSelected(null)} style={{ padding: '8px 12px', borderRadius: 8, background: '#ddd', color: '#111', border: 'none' }}>
+            <button onClick={() => setSelected(null)} className="px-3 py-2 rounded-md bg-gray-200 text-gray-800">
               Cancel
             </button>
           </div>
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="e.g. morning flights, business class" style={{ flex: 1, padding: 8, borderRadius: 6 }} />
-        <button onClick={handleSend} disabled={loading} style={{ padding: '8px 12px', borderRadius: 8, background: '#3478f6', color: '#fff', border: 'none' }}>
+      <div className="flex gap-2 mb-3 border rounded-md ">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="e.g. morning flights, business class"
+          className="flex-1 p-2 rounded-md border border-gray-200"
+        />
+        <button onClick={handleSend} disabled={loading} className="  px-3 py-2 rounded-md bg-[#8D0101] text-white disabled:opacity-60">
           {loading ? 'Searching...' : 'Send'}
         </button>
       </div>
 
       {bookingResult && (
-        <div style={{ marginTop: 8, background: '#e6ffed', padding: 8, borderRadius: 6 }}>
-          <div>Booking result: {JSON.stringify(bookingResult)}</div>
+        <div className="mt-3 bg-green-300 text-center p-2 rounded-md font-semibold text-[30px]">
+          <div>Booking Created</div>
         </div>
       )}
 
-      {error && <div style={{ color: 'salmon', marginTop: 8 }}>{error}</div>}
+      {error && <div className="text-red-500 mt-2">{error}</div>}
     </div>
   );
 }
