@@ -50,18 +50,19 @@ def _parse_flight_data(flights_raw):
         }
         parsed_flights.append(flight_info)
     
+    
     return parsed_flights
 
 
 def fetch_flight_data_from_serpapi(
-    departure_id: str = "AMS",
-    arrival_id: str = "ATL",
-    outbound_date: str = "2025-12-25",
-    return_date: str = "2026-01-04",
-    currency: str = "EUR",
-    sort_by: int = 1,
-    output_file: str = "flight_data.json",
-    parse_only_essentials: bool = True
+    departure_id: str,
+    arrival_id: str,
+    outbound_date: str,
+    return_date: str,
+    currency: str,
+    sort_by: int,
+    parse_only_essentials: bool,
+    output_file: str = None
 ):
     """
     Fetch flight data from SerpApi Google Flights and optionally parse essential attributes.
@@ -99,26 +100,34 @@ def fetch_flight_data_from_serpapi(
     results = search.get_dict()
 
     # Extract best_flights and other_flights from the response
-    flights_data = {
-        "best_flights": results.get("best_flights", []),
-        "other_flights": results.get("other_flights", [])
-    }
+    best_flights = results.get("best_flights", [])
+    other_flights = results.get("other_flights", [])
+    all_flights = best_flights + other_flights
 
-    # Save raw data to file
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(flights_data, f, indent=4, ensure_ascii=False)
 
-    print(f"✅ Flight data saved to {output_file}")
-    print(f"📊 Found {len(flights_data['best_flights'])} best flight(s) and {len(flights_data['other_flights'])} other flight(s)")
+
+    print(f"✈️ Found {len(all_flights)} flights.")
     
     # Parse and return essential attributes if requested
     if parse_only_essentials:
-        all_flights = flights_data.get('best_flights', []) + flights_data.get('other_flights', [])
-        parsed_flights = _parse_flight_data(all_flights)
-        print(f"✈️ Parsed {len(parsed_flights)} flights with essential attributes")
+        parsed_flights = []
+        for flight in all_flights:
+            try:
+                parsed_flights.append({
+                    "airline": flight.get("airline", "Unknown"),
+                    "price": flight.get("price", {}).get("amount") if isinstance(flight.get("price"), dict) else flight.get("price"),
+                    "currency": currency,
+                    "duration": flight.get("total_duration") or flight.get("duration"),
+                    "route": f"{departure_id} → {arrival_id}",
+                    "departure": departure_id,
+                    "arrival": arrival_id,
+                    "departure_date": outbound_date,
+                    "return_date": return_date
+                })
+            except Exception as e:
+                print(f"⚠️ Skipping invalid flight entry: {e}")
+        print(f"✈️ Parsed {len(parsed_flights)} flights with essential attributes.")
         return parsed_flights
-    else:
-        return flights_data
 
 
 # Example usage:

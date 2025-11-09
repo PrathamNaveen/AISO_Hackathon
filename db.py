@@ -4,13 +4,17 @@ import re
 import os
 
 def get_db_connection():
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        dbname=os.getenv("DB_NAME"),
-        port=os.getenv("DB_PORT", 5432)
-    )
+    try:
+        return psycopg2.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            dbname=os.getenv("DB_NAME"),
+            port=os.getenv("DB_PORT", 5432)
+        )
+    except Exception as e:
+        print(f"❌ Error connecting to database: {e}")
+        return None
 
 def fetch_user_emails_from_db(user_email: str):
     """Fetches all emails linked to a user based on their email address."""
