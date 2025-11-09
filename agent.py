@@ -1,3 +1,4 @@
+from db import write_parsed_email_to_db
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
@@ -83,6 +84,77 @@ def get_user_preferences(state: MessagesState):
     preferences_dict = {"preferences_text": str(user_input)}
     chain.update_state(config, preferences_dict, as_node="ask_preferences")
     return preferences_dict
+
+def parse_user_emails_node(state: MessagesState):
+    """
+    Fetches emails for a user, checks if any are invitations,
+    parses them using LLM, and writes structured info to the DB.
+    Includes robust error handling for DB/LLM issues.
+    """
+    try:
+        from db import fetch_user_emails_from_db  # import safely
+        from db import write_parsed_email_to_db
+    except Exception as e:
+        print(f"❌ Failed to import DB functions: {e}")
+        return {"emails_parsed": False}
+
+    try:
+        user_email = input("📧 Enter your signed-in email: ").strip()
+        if not user_email:
+            print("⚠️ No email entered. Skipping email parsing.")
+            return {"emails_parsed": False}
+
+        # Fetch emails from DB
+        try:
+            emails = fetch_user_emails_from_db(user_email)
+        except Exception as db_error:
+            print(f"❌ Database fetch error: {db_error}")
+            return {"emails_parsed": False}
+
+        if not emails:
+            print("📭 No emails found for this user.")
+            return {"emails_parsed": False}
+
+        print(f"📬 Found {len(emails)} emails. Checking for invitations...")
+
+        emails_length = 5
+        for i in range(min(len(emails), emails_length)):
+            try:
+                text = f"{emails[i].get('header', '')} {emails[i].get('body', '')}".lower()
+                if any(word in text for word in ["invite", "invitation", "meeting", "event", "conference"]):
+                    print(f"\n📨 Invitation found: {emails[i].get('header', 'No Subject')}")
+                    prompt = f"""
+Extract event details from this invitation email.
+Email content:
+{emails[i].get('header', '')} - {emails[i].get('body', '')}
+Return valid JSON only in this format:
+{{
+  "event_title": "<title>",
+  "event_location": "<location or city if mentioned>",
+  "event_time": "<time/date if available>"
+}}
+"""
+                    try:
+                        response = llm.invoke([HumanMessage(content=prompt)]).content
+                        cleaned = re.sub(r'```json\s*|\s*```', '', response).strip()
+                        parsed = json.loads(cleaned)
+                        write_parsed_email_to_db(emails[i].get("emailid"), parsed)
+                        print(f"✅ Parsed and stored event: {parsed}")
+                    except json.JSONDecodeError:
+                        print("⚠️ LLM returned invalid JSON, skipping this email.")
+                    except Exception as e:
+                        print(f"⚠️ Error while parsing or writing email {emails[i].get('emailid')}: {e}")
+                else:
+                    print(f"📨 Skipping non-invitation email: {emails[i].get('header', 'No Subject')}")
+            except Exception as inner_err:
+                print(f"⚠️ Error while processing an email: {inner_err}")
+
+        return {"emails_parsed": True}
+
+    except Exception as e:
+        print(f"💥 Unexpected error in parse_user_emails_node: {e}")
+        return {"emails_parsed": False}
+
 
 def flight_data_node(state: MessagesState):
     user_text = state.get("preferences_text", "")
@@ -185,16 +257,17 @@ def booking_or_repeat(state: MessagesState):
 # -------------------------------
 workflow = StateGraph(MessagesState)
 workflow.add_node("start", start_node)
+workflow.add_node("parse_emails", parse_user_emails_node)
 workflow.add_node("ask_preferences", get_user_preferences)
 workflow.add_node("fetch_flight", flight_data_node)
 workflow.add_node("compute_best_flight", compute_best_flight)
 workflow.add_node("display", display_flights)
 workflow.add_node("decision", booking_or_repeat)
 
-workflow.add_edge(START, "start")
-workflow.add_edge("start", "ask_preferences")
+workflow.add_edge(START, "parse_emails")
+# workflow.add_edge(, "parse_emails")
+workflow.add_edge("parse_emails", "ask_preferences")
 workflow.add_edge("ask_preferences", "fetch_flight")
-
 
 workflow.add_edge("fetch_flight", "compute_best_flight")
 workflow.add_edge("compute_best_flight", "display")

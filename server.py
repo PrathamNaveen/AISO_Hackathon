@@ -8,7 +8,7 @@ import jwt
 import os
 import json
 
-from databases.db import get_db_connection, insert_email
+from AISO_Hackathon.db import get_db_connection, insert_email
 from dotenv import load_dotenv
 
 load_dotenv()
