@@ -2,7 +2,7 @@ from db import write_parsed_email_to_db
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
-from typing import TypedDict
+from typing import TypedDict, Optional
 from dotenv import load_dotenv
 import os
 import sys
@@ -15,6 +15,7 @@ from langgraph.store.memory import InMemoryStore
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_flight_data import fetch_flight_data_from_api
 from message import fetch_flight_data_from_serpapi
+from filter_calender import get_december_2025_events, filter_flights as filter_flights_against_calendar
 
 # -------------------------------
 # Load environment
@@ -133,6 +134,7 @@ class MessagesState(TypedDict):
     flights: list[dict]
     best_flight: dict
     user_choice: str
+    calendar_events: Optional[list[dict]]
 
 llm = ChatOpenAI(model="gpt-5", temperature=0.3,
                  base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")
@@ -247,6 +249,42 @@ def flight_data_node(state: MessagesState):
     flights_dict = {"flights": flights}
     chain.update_state(config, flights_dict, as_node="fetch_flight")
     return flights_dict
+
+
+def filter_flights_by_calender_node(state: MessagesState):
+    flights = state.get("flights", [])
+
+    if not flights:
+        print("📭 No flights available for calendar filtering.")
+        return {"flights": flights}
+
+    try:
+        events = get_december_2025_events()
+    except Exception as e:
+        print(f"⚠️ Failed to fetch calendar events: {e}")
+        return {"flights": flights}
+
+    if not events:
+        print("📭 No calendar events found; skipping calendar-based filtering.")
+        result_state = {"flights": flights, "calendar_events": []}
+        chain.update_state(config, result_state, as_node="filter_flights_by_calender")
+        return result_state
+
+    try:
+        filtered_flights = filter_flights_against_calendar(events, flights)
+    except Exception as e:
+        print(f"⚠️ Calendar filtering failed: {e}")
+        filtered_flights = flights
+
+    if not filtered_flights:
+        print("😕 Calendar filtering removed all flights. Keeping original list.")
+        filtered_flights = flights
+    else:
+        print(f"🗓️ {len(filtered_flights)} flights remain after calendar filtering.")
+
+    result_state = {"flights": filtered_flights, "calendar_events": events}
+    chain.update_state(config, result_state, as_node="filter_flights_by_calender")
+    return result_state
 
 def compute_best_flight(state: MessagesState):
     flights = state.get("flights", [])
@@ -383,6 +421,7 @@ workflow.add_node("start", start_node)
 workflow.add_node("parse_emails", parse_user_emails_node)
 workflow.add_node("ask_preferences", get_user_preferences)
 workflow.add_node("fetch_flight", flight_data_node)
+workflow.add_node("filter_flights_by_calender", filter_flights_by_calender_node)
 workflow.add_node("compute_best_flight", compute_best_flight)
 workflow.add_node("display", display_flights)
 workflow.add_node("decision", booking_or_repeat)
@@ -391,8 +430,8 @@ workflow.add_edge(START, "parse_emails")
 # workflow.add_edge(, "parse_emails")
 workflow.add_edge("parse_emails", "ask_preferences")
 workflow.add_edge("ask_preferences", "fetch_flight")
-
-workflow.add_edge("fetch_flight", "compute_best_flight")
+workflow.add_edge("fetch_flight", "filter_flights_by_calender")
+workflow.add_edge("filter_flights_by_calender", "compute_best_flight")
 workflow.add_edge("compute_best_flight", "display")
 workflow.add_edge("display", "decision")
 workflow.add_conditional_edges(
