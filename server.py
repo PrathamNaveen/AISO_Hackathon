@@ -23,6 +23,8 @@ origins = [
     "http://127.0.0.1:3000",
 ]
 
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -309,4 +311,62 @@ def create_booking(req: BookingRequest):
         "candidate_id": req.candidate_id,
         "meeting_id": req.meeting_id,
         "user_info": req.user_info,
+    }
+  
+  
+class SignupRequest(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+def get_user_by_email(email: str = 'dummy@gmail.com'):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        print("Fetching user by email:", email)
+        cur.execute("SELECT userid, email, name, password FROM users WHERE email = %s", (email,))
+        row = cur.fetchone()
+        if row:
+            return {"userid": row[0], "email": row[1], "name": row[2], "password": row[3]}
+        return None
+    finally:
+        cur.close()
+        conn.close()
+
+def create_user(email: str, name: str, password: str):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "INSERT INTO users (email, name, password) VALUES (%s, %s, %s) RETURNING userid",
+            (email, name, password)
+        )
+        user_id = cur.fetchone()[0]
+        conn.commit()
+        return user_id
+    finally:
+        cur.close()
+        conn.close()
+
+@app.post("/api/auth/signup")
+def signup(req: SignupRequest, response: Response):
+    existing_user = get_user_by_email(req.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists")
+    
+    user_id = create_user(req.email, req.name, req.password)
+    return {"message": "Signup successful", "user": {"userid": user_id, "email": req.email, "name": req.name}}
+
+@app.post("/api/auth/login")
+def login(req: LoginRequest, response: Response):
+    user = get_user_by_email(req.email)
+    if not user or user["password"] != req.password:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    return {"message": "Login successful", "user": {"userid": user["userid"], "email": user["email"], "name": user["name"]}}
+
     }

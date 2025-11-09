@@ -20,13 +20,14 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     sessionids INTEGER[],  
-    flightid INTEGER,      
+    flightid INTEGER,
     bookings INTEGER DEFAULT 0
 );
 
 -- EMAILS TABLE
 CREATE TABLE IF NOT EXISTS emails (
     emailid SERIAL PRIMARY KEY,
+    userid INTEGER REFERENCES users(userid) ON DELETE CASCADE,
     sender VARCHAR(150) NOT NULL,
     header VARCHAR(255),
     body TEXT
@@ -58,14 +59,14 @@ CREATE TABLE IF NOT EXISTS flights (
 -- ===========================================
 
 -- Users
-INSERT INTO users (name, password, email, sessionids, bookings)
+INSERT INTO users (name, password, userid, email, sessionids, bookings)
 VALUES 
-('Pratham', 'hashed_pwd_123', 'pratham@example.com', ARRAY[1,2], 2)
+('Pratham', 'hashed_pwd_123', 1,'pratham@example.com', ARRAY[1,2], 2)
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO users (name, password, email, sessionids, bookings)
 VALUES 
-('Aisha', 'hashed_pwd_456', 'aisha@example.com', ARRAY[3], 1)
+('Aisha', 'hashed_pwd_456', 2, 'aisha@example.com', ARRAY[3], 1)
 ON CONFLICT (email) DO NOTHING;
 
 -- Emails
@@ -121,4 +122,16 @@ SELECT * FROM flights;
 -- List all sessions
 SELECT * FROM sessions;
 
+------------------------------------------------------------------------------------------------------------------------------------
+
 -- Join example: user sessions with emails and flights
+ALTER TABLE emails
+ADD COLUMN is_invitation BOOLEAN DEFAULT FALSE;
+
+-- Example: marking an email as an invitation
+UPDATE emails
+SET is_invitation = TRUE
+WHERE emailid = 3;
+
+SELECT * FROM emails
+WHERE is_invitation = TRUE;
