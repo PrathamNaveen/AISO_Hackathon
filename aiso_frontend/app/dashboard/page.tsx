@@ -66,7 +66,7 @@ export default function DashboardPage() {
       {/* Right column */}
       <div className="flex-1 bg-gray-100 overflow-auto">
         <div className="p-3">
-          <h2 className="text-[30px] text-center font-semibold">Tell us more about your preference</h2>
+          <h2 className="text-[30px] text-center font-semibold text-black">Tell us more about your preference</h2>
         </div>
 
         <div className="p-3">

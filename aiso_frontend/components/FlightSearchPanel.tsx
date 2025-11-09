@@ -56,9 +56,9 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
   }
 
   return (
-    <div className="p-3 flex flex-col h-full">
+    <div className="p-3 flex flex-col text-color-black h-full">
       <div className="mb-2">
-        <h3 className="m-0 text-lg font-medium">Assistant (chat)</h3>
+        <h3 className="m-0 text-lg text-gray-900 font-medium">Assistant (chat)</h3>
         <div className="text-sm text-gray-500">Type preferences, then press send. Agent will return flight lists.</div>
       </div>
 
@@ -115,7 +115,7 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="e.g. morning flights, business class"
-          className="flex-1 p-2 rounded-md border border-gray-200"
+          className="flex-1 p-2 rounded-md border border-gray-200 text-gray-900"
         />
         <button onClick={handleSend} disabled={loading} className="  px-3 py-2 rounded-md bg-[#8D0101] text-white disabled:opacity-60">
           {loading ? 'Searching...' : 'Send'}
