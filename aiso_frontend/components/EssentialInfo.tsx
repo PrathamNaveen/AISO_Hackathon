@@ -1,7 +1,7 @@
 // src/components/EssentialInfo.tsx
 import React, { useEffect, useState } from 'react';
 import type { EssentialInfo } from '../types/api';
-import { fetchEssential, confirmEssential } from '../lib/api';
+import { fetchEssential } from '../lib/api';
 
 export default function EssentialInfo({
   meetingId,
@@ -14,6 +14,7 @@ export default function EssentialInfo({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<any>(null);
 
   useEffect(() => {
     if (!meetingId) {
@@ -46,12 +47,28 @@ export default function EssentialInfo({
   }
 
   async function handleConfirm() {
-    if (!meetingId || !data) return;
+    if (!data) return;
     setSaving(true);
     setError(null);
     try {
-      const res = await confirmEssential(meetingId, data as any);
-      if (res?.taskId && onConfirmed) onConfirmed(res.taskId);
+      const response = await fetch('http://localhost:8000/api/preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          departure_airport: data.from?.code,
+          arrival_airport: data.to?.code,
+          date: data.date ?? '2025-12-25',
+          days: data.stayRange?.maxDays ?? 10,
+          currency: 'USD',
+          budget: data.budget ?? 9999,
+        }),
+      });
+
+      const res = await response.json();
+      if (!response.ok) throw new Error(res.detail || 'Server error');
+
+      setResult(res.data);
+      if (onConfirmed) onConfirmed('task_done');
     } catch (err: any) {
       setError(String(err));
     } finally {
@@ -64,7 +81,6 @@ export default function EssentialInfo({
 
   return (
     <div className="p-2">
-      {/* smaller stacked box */}
       <div className="bg-[#FFFFFF]/20 rounded-lg p-3 text-white w-full">
         <h3 className="text-lg font-semibold text-center mb-3">Essential information</h3>
 
@@ -108,7 +124,7 @@ export default function EssentialInfo({
               onChange={(e) => update('tripType', e.target.value)}
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             >
-              <option value="round-trip font-semibold">Round-trip</option>
+              <option value="round-trip">Round-trip</option>
               <option value="one-way">One-way</option>
             </select>
           </div>
@@ -167,6 +183,13 @@ export default function EssentialInfo({
             {saving ? 'Saving...' : 'Confirm'}
           </button>
         </div>
+
+        {result && (
+          <div className="mt-4 bg-white/10 p-2 rounded text-sm text-gray-100">
+            <div className="font-semibold mb-1">Backend Response:</div>
+            <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(result, null, 2)}</pre>
+          </div>
+        )}
       </div>
     </div>
   );

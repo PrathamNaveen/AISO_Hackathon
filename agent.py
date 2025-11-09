@@ -48,7 +48,7 @@ def fetch_flight_data_wrapper(preferences: dict):
     }
 
     # ---- Merge user preferences ----
-    merged = {**default_preferences, **(preferences or {})}
+    merged = {**(preferences or {})}
 
     # Convert date properly
     try:
@@ -226,16 +226,24 @@ Email content:
 
 
 def flight_data_node(state: MessagesState):
-    user_text = state.get("preferences_text", "")
-    combined_info = {"user_query": user_text}
+    import json
+    # preferences_text is a JSON string, convert to dict
+    prefs_text = state.get("preferences_text", "{}")
     try:
-        flights = fetch_flight_data_wrapper(combined_info)
+        prefs_dict = json.loads(prefs_text)
+    except json.JSONDecodeError:
+        prefs_dict = {}
+
+    try:
+        flights = fetch_flight_data_wrapper(prefs_dict)
     except Exception as e:
         print(f"❌ Error fetching flight data: {e}")
         flights = []
+
     flights_dict = {"flights": flights}
     chain.update_state(config, flights_dict, as_node="fetch_flight")
     return flights_dict
+
 
 def compute_best_flight(state: MessagesState):
     flights = state.get("flights", [])
@@ -319,17 +327,15 @@ def display_flights(state: MessagesState):
     best_flights = state.get("best_flight", [])
     if not best_flights:
         print("😕 No best flights available to display.")
-        return {"user_choice": "no"}
+        return {"user_choice": state.get("user_choice", "no")}
 
     print("\n🏆 Top 3 flight recommendations:")
     for i, f in enumerate(best_flights, start=1):
-        print(f"\n{i}. ✈️ {f.get('airline', 'N/A')}")
-        print(f"   💰 Price: ${f.get('price', 'N/A')}")
-        print(f"   🕒 Duration: {f.get('duration', 'N/A')}")
-        print(f"   🧭 Route: {f.get('route', 'N/A')}")
-        print(f"   💬 Reason: {f.get('reason', 'N/A')}")
+        print(f"{i}. ✈️ {f.get('airline', 'N/A')} - 💰 ${f.get('price', 'N/A')} - 🕒 {f.get('duration', 'N/A')}")
 
-    choice = input("\nWould you like to book one of these flights? (yes/no): ").strip().lower()
+    # Use existing state if set, otherwise default to 'yes'
+    choice = state.get("user_choice", "yes")
+    print(f"Auto-choice for booking: {choice}")
     return {"user_choice": choice}
 
 
@@ -376,10 +382,11 @@ workflow.add_node("compute_best_flight", compute_best_flight)
 workflow.add_node("display", display_flights)
 workflow.add_node("decision", booking_or_repeat)
 
-workflow.add_edge(START, "parse_emails")
+workflow.add_edge(START, "fetch_flight")
+# workflow.add_edge("parse_emails", "ask_preferences")
 # workflow.add_edge(, "parse_emails")
-workflow.add_edge("parse_emails", "ask_preferences")
-workflow.add_edge("ask_preferences", "fetch_flight")
+# workflow.add_edge("parse_emails", "ask_preferences")
+# workflow.add_edge("ask_preferences", "fetch_flight")
 
 workflow.add_edge("fetch_flight", "compute_best_flight")
 workflow.add_edge("compute_best_flight", "display")
@@ -396,31 +403,74 @@ store = InMemoryStore()
 chain = workflow.compile(checkpointer=checkpointer, store=store)
 config: RunnableConfig = {"configurable": {"thread_id": "1"}}
 
-def run_flight_finder_agent(config: RunnableConfig = {"configurable": {"thread_id": "1"}}):
+def run_flight_finder_agent_with_preferences(preferences: dict):
     """
-    Runs the full flight finder graph and returns final results.
-    Useful for running on servers or from other scripts.
+    🚀 Runs the full LangGraph chain (starting naturally from START → fetch_flight → compute_best_flight → display → decision)
+    using frontend-provided preferences.
     """
-    print("🚀 Starting Flight Finder Agent...\n")
-    final_state = chain.invoke({}, config=config)
+    print("🚀 Running full LangGraph chain with frontend preferences...")
+    print("🧳 Preferences received:", preferences)
 
-    status = final_state.get("status")
-    best_flight = final_state.get("best_flight")
+    # Build the initial graph state
+    initial_state = {
+        "messages": [HumanMessage(content="Find me the best flights")],
+        "preferences_text": json.dumps(preferences),
+        "flights": [],
+        "best_flight": [],
+        "user_choice": "yes"
+    }
 
-    # Return structured data (not just print)
-    if status == "booking_confirmed" and best_flight:
-        result = {
-            "status": "booking_confirmed",
-            "best_flight": best_flight
+    try:
+        # ✅ invoke from START (LangGraph automatically continues)
+        final_state = chain.invoke(initial_state, config=config)
+
+        print("✅ LangGraph chain executed successfully.")
+        return {
+            "status": "ok",
+            "best_flight": final_state.get("best_flight", []),
+            "raw_state": final_state
         }
-    else:
-        result = {
-            "status": status or "incomplete",
-            "best_flight": None
-        }
 
-    print("🏁 Agent finished execution.")
-    return result
+    except Exception as e:
+        print(f"❌ Error running LangGraph chain: {e}")
+        return {"status": "error", "message": str(e)}
+
+    """
+    🚀 Runs the entire LangGraph flight-finding workflow automatically
+    using the preferences sent from the frontend.
+    This now invokes the full chain instead of only fetching flights.
+    """
+    print("🚀 Running full LangGraph chain with frontend preferences...")
+    print("🧳 Preferences received:", preferences)
+
+    # ✅ Step 1 — Create initial LangGraph state
+    initial_state = {
+        "messages": [HumanMessage(content="Find me the best flights")],
+        "preferences_text": json.dumps(preferences),  # directly store JSON prefs
+        "flights": [],
+        "best_flight": [],
+        "user_choice": "yes"  # Auto-accept booking; adjust if needed
+    }
+
+    print("HELLO")
+
+    # ✅ Step 2 — Run the LangGraph chain end-to-end
+    try:
+        final_state = chain.invoke(initial_state, config=config, node="fetch_flight")
+
+        print("✅ LangGraph chain executed successfully.")
+    except Exception as e:
+        print(f"❌ Error running LangGraph chain: {e}")
+        return {"status": "error", "message": str(e)}
+
+
+    # ✅ Step 4 — Build structured response for frontend
+    return {
+        "status": "ok",
+        "best_flight": final_state.get("best_flight", []),
+        "raw_state": final_state
+    }
+
 
 def generate_reasoning_from_state(state: MessagesState):
     """

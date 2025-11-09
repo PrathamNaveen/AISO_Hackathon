@@ -1,29 +1,45 @@
 // src/components/EventsList.tsx
 import React, { useEffect, useState } from 'react';
 import type { EventItem } from '../types/api';
-import { fetchEvents } from '../lib/api';
 
-export default function EventsList({ onSelect }: { onSelect: (evt: EventItem) => void }) {
+interface EventsListProps {
+  onSelect: (evt: EventItem) => void;
+}
+
+export default function EventsList({ onSelect }: EventsListProps) {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const userId = '3';
+  const BASE_URL = "http://localhost:8000"; // replace with your FastAPI URL
+
+
   useEffect(() => {
     let mounted = true;
-    fetchEvents()
-      .then((data) => {
+
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/invitations?user_id=userId}`);
+        
+        if (!res.ok) throw new Error(`Failed to fetch invitations: ${res.statusText}`);
+        const data: EventItem[] = await res.json();
         if (!mounted) return;
         setEvents(data);
-      })
-      .catch((err) => {
+      } catch (err: any) {
         if (!mounted) return;
-        setError(String(err));
-      })
-      .finally(() => mounted && setLoading(false));
+        setError(err.message || "Unknown error");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchEvents();
+
     return () => {
       mounted = false;
     };
-  }, []);
+  }, []); // no dependency, runs once
 
   if (loading) return <div className="p-3">Loading events...</div>;
   if (error) return <div className="p-3 text-red-600">Error: {error}</div>;
