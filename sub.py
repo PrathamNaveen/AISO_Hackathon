@@ -6,7 +6,7 @@ import base64
 from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from databases.db import insert_email
+from AISO_Hackathon.db import insert_email
 
 load_dotenv()
 

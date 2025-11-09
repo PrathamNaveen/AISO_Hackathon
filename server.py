@@ -1,15 +1,20 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+# server.py
+from fastapi import FastAPI, HTTPException, Depends, Cookie, Response, Path, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
 from importlib import import_module
+from pydantic import BaseModel, EmailStr,ConfigDict, Field
+from typing import Optional, List, Dict, Any
+from datetime import datetime, timedelta
+import jwt
+import os
+import json
 import traceback
 import uuid
-import json
 from pathlib import Path
 from typing import Tuple
 
-app = FastAPI()
+from db import get_db_connection
+from dotenv import load_dotenv
 
 # Enable CORS for local frontend development. In prod, lock this down to your
 # real frontend origin or use an nginx reverse-proxy so services are same-origin.
@@ -355,4 +360,35 @@ def create_booking(req: BookingRequest):
         "meeting_id": req.meeting_id,
         "user_info": req.user_info,
     }
+  
+  
+class SignupRequest(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+@app.post("/api/auth/signup")
+def signup(req: SignupRequest, response: Response):
+    existing_user = get_user_by_email(req.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists")
+    
+    user_id = create_user(req.email, req.name, req.password)
+    token = create_token(user_id, req.email)
+    response.set_cookie("session_token", token, httponly=True, max_age=TOKEN_EXPIRE_HOURS*3600, samesite="lax")
+    return {"message": "Signup successful", "user": {"userid": user_id, "email": req.email, "name": req.name}}
+
+@app.post("/api/auth/login")
+def login(req: LoginRequest, response: Response):
+    user = get_user_by_email(req.email)
+    if not user or user["password"] != req.password:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    token = create_token(user["userid"], user["email"])
+    response.set_cookie("session_token", token, httponly=True, max_age=TOKEN_EXPIRE_HOURS*3600, samesite="lax")
+    return {"message": "Login successful", "user": {"userid": user["userid"], "email": user["email"], "name": user["name"]}}
 
