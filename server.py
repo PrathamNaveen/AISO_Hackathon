@@ -1,42 +1,367 @@
 # server.py
-from fastapi import FastAPI, HTTPException, Depends, Cookie, Response, Path
+from fastapi import FastAPI, HTTPException, Depends, Cookie, Response, Path, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr,ConfigDict
+from importlib import import_module
+from pydantic import BaseModel, EmailStr,ConfigDict, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta
 import jwt
 import os
 import json
+import traceback
+import uuid
+from pathlib import Path
+from typing import Tuple
 
 from db import get_db_connection
 from dotenv import load_dotenv
 
-load_dotenv()
+# Enable CORS for local frontend development. In prod, lock this down to your
+# real frontend origin or use an nginx reverse-proxy so services are same-origin.
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
-app = FastAPI(
-    title="Flight Assistant API",
-    description="Minimal AI-powered flight booking assistant",
-    version="1.0.0"
-)
-
-# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# JWT Config
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret")
-ALGORITHM = "HS256"
-TOKEN_EXPIRE_HOURS = 24
 
-# -----------------------
-# Models
-# -----------------------
+class Preferences(BaseModel):
+    departure_airport: Optional[str] = Field(None, description="IATA code of departure airport")
+    arrival_airport: Optional[str] = Field(None, description="IATA code of arrival airport")
+    date: Optional[str] = Field(None, description="Outbound date YYYY-MM-DD")
+    days: Optional[int] = Field(7, description="Trip length in days")
+    currency: Optional[str] = Field("USD")
+    budget: Optional[float] = Field(None)
+    # allow extra arbitrary fields
+    extra: Optional[Dict[str, Any]] = None
 
+
+class FlightCandidate(BaseModel):
+    id: Optional[str]
+    airline: Optional[str]
+    price: Optional[float]
+    currency: Optional[str]
+    duration: Optional[str]
+    route: Optional[str]
+    details: Optional[Dict[str, Any]] = None
+
+
+class BookingRequest(BaseModel):
+    meeting_id: Optional[str]
+    candidate_id: str
+    user_info: Optional[Dict[str, Any]] = None
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello, AISO!"}
+
+
+def _lazy_import_agent():
+    """Lazy import of the agent module. Returns module or raises ImportError.
+
+    We import at request time so server import doesn't fail if agent's dependencies
+    are missing in this environment. The caller should catch ImportError and
+    return a 500 with the traceback for debugging.
+    """
+    try:
+        agent = import_module("agent.agent")
+        return agent
+    except Exception:
+        raise
+
+
+# ----------------------------
+# Simple in-memory mock datastore
+# ----------------------------
+def _rand(prefix: str = '') -> str:
+    return prefix + uuid.uuid4().hex[:8]
+
+
+_mock = {
+    "events": [
+        {
+            "id": "evt_1",
+            "title": "AI - AISO Meetup",
+            "location": "Amsterdam",
+            "start": None,
+            "organizer": "bob@company.com",
+            "rawEmailId": "gmail_msg_abc",
+            "processed": False,
+        },
+        {
+            "id": "evt_2",
+            "title": "Sales Offsite",
+            "location": "New York",
+            "start": None,
+            "organizer": "sarah@company.com",
+            "rawEmailId": "gmail_msg_def",
+            "processed": False,
+        },
+    ],
+    "essential": {
+        "evt_1": {
+            "meetingId": "evt_1",
+            "from": {"code": "JFK", "label": "John F. Kennedy (JFK)"},
+            "to": {"code": "AMS", "label": "Amsterdam (AMS)"},
+            "class": "business",
+            "tripType": "round-trip",
+            "stayRange": {"minDays": 2, "maxDays": 5},
+            "arriveBeforeDays": {"min": 0, "max": 1},
+        }
+    },
+    "short_term": {},
+    "reasoning": {
+        "evt_1": [
+            {"ts": "2025-11-09T00:00:00Z", "type": "step", "text": "Prefill origin detected: JFK", "meta": {"confidence": 0.92}}
+        ]
+    },
+    "searches": {},
+    "bookings": {},
+}
+
+
+def _load_json_if_exists(name: str) -> Tuple[bool, list]:
+    p = Path(name)
+    if p.exists():
+        try:
+            return True, json.loads(p.read_text())
+        except Exception:
+            return False, []
+    return False, []
+
+
+# try to load parsed flights as fallback data
+_, PARSED_FLIGHTS = _load_json_if_exists("parsed_flights.json")
+_, TOP_3_FLIGHTS = _load_json_if_exists("top_3_flights.json")
+
+
+@app.post("/api/agent/search_flights", response_model=List[FlightCandidate])
+def search_flights(prefs: Preferences):
+    """Search flights using the logic in `agent.py`.
+
+    This calls `fetch_flight_data_wrapper(preferences_dict)` from `agent.py`.
+    """
+    try:
+        agent = _lazy_import_agent()
+    except Exception as e:
+        tb = traceback.format_exc()
+        raise HTTPException(status_code=500, detail={"error": "Failed to import agent module", "trace": tb})
+
+    # Prefer a dedicated wrapper function if present
+    if hasattr(agent, "fetch_flight_data_wrapper"):
+        try:
+            prefs_dict = prefs.dict()
+            # merge extras if provided
+            if prefs.extra:
+                prefs_dict.update(prefs.extra)
+            flights = agent.fetch_flight_data_wrapper(prefs_dict)
+            # Normalize/validate to FlightCandidate list
+            out = []
+            for f in flights or []:
+                out.append(FlightCandidate(**{k: v for k, v in f.items()}))
+            return out
+        except Exception:
+            tb = traceback.format_exc()
+            raise HTTPException(status_code=500, detail={"error": "Agent execution failed", "trace": tb})
+    else:
+        raise HTTPException(status_code=501, detail="Agent does not expose fetch_flight_data_wrapper")
+
+
+# ----------------------------
+# Frontend-facing mock endpoints
+# ----------------------------
+
+
+@app.get("/api/events")
+def get_events():
+    return _mock["events"]
+
+
+@app.get("/api/meetings/{meeting_id}/essential")
+def get_essential(meeting_id: str):
+    # prefer short-term override then essential prefill
+    if meeting_id in _mock["short_term"]:
+        return _mock["short_term"][meeting_id]
+    if meeting_id in _mock["essential"]:
+        return _mock["essential"][meeting_id]
+    # fallback empty structure
+    return {
+        "meetingId": meeting_id,
+        "from": {"code": "AMS", "label": "Amsterdam (AMS)"},
+        "to": {"code": "JFK", "label": "John F. Kennedy (JFK)"},
+        "class": "economy",
+        "tripType": "round-trip",
+        "stayRange": {"minDays": 2, "maxDays": 7},
+        "arriveBeforeDays": {"min": 0, "max": 1},
+    }
+
+
+@app.post("/api/meetings/{meeting_id}/essential/confirm", status_code=202)
+def confirm_essential(meeting_id: str, payload: Dict[str, Any], background_tasks: BackgroundTasks):
+    """Accepts a partial EssentialInfo payload, stores it in short-term memory and
+    triggers a mock background search task (synchronous here but returns a task id).
+    """
+    # save short-term memory
+    _mock["short_term"][meeting_id] = payload
+
+    # create a mock search task
+    task_id = _rand("task_")
+
+    # create candidate search result now (in real app this would be async)
+    candidates = []
+    if PARSED_FLIGHTS:
+        # take top N from parsed flights as mock candidates
+        for i, f in enumerate(PARSED_FLIGHTS[:3]):
+            candidates.append({
+                "id": f.get("airline", "f") + f"_{i}",
+                "price": f.get("price"),
+                "itinerary": f.get("route"),
+                "provider": f.get("airline"),
+                "details": f,
+            })
+    elif TOP_3_FLIGHTS:
+        for i, f in enumerate(TOP_3_FLIGHTS[:3]):
+            candidates.append({
+                "id": f"f_{i}",
+                "price": f.get("price"),
+                "itinerary": f.get("route"),
+                "provider": f.get("airline"),
+                "details": f,
+            })
+    else:
+        # very small deterministic fallback
+        candidates = [
+            {"id": _rand("f_"), "price": 999, "itinerary": "AMS → JFK non-stop", "provider": "MockAir", "details": {}},
+            {"id": _rand("f_"), "price": 1299, "itinerary": "AMS → JFK 1 stop", "provider": "MockAir", "details": {}},
+        ]
+
+    search_id = _rand("s_")
+    _mock["searches"][search_id] = {"searchId": search_id, "status": "completed", "candidates": candidates}
+
+    return {"taskId": search_id, "status": "queued"}
+
+
+@app.post("/api/flights/search")
+def flights_search(body: Dict[str, Any]):
+    """Search flights. Try to call agent.fetch_flight_data_wrapper if available,
+    otherwise return a mock FlightSearchResponse.
+    """
+    # try agent first
+    try:
+        agent = _lazy_import_agent()
+    except Exception:
+        agent = None
+
+    if agent and hasattr(agent, "fetch_flight_data_wrapper"):
+        try:
+            prefs = body or {}
+            flights = agent.fetch_flight_data_wrapper(prefs)
+            # build response
+            sid = _rand("s_")
+            candidates = []
+            for i, f in enumerate(flights or []):
+                candidates.append({
+                    "id": f.get("id") or f"f_{i}",
+                    "price": f.get("price"),
+                    "itinerary": f.get("route"),
+                    "provider": f.get("airline") or f.get("provider"),
+                    "details": f,
+                })
+            resp = {"searchId": sid, "status": "completed", "candidates": candidates}
+            _mock["searches"][sid] = resp
+            return resp
+        except Exception:
+            tb = traceback.format_exc()
+            raise HTTPException(status_code=500, detail={"error": "agent search failed", "trace": tb})
+
+    # fallback to local parsed/top_3 data
+    candidates = []
+    for i, f in enumerate((PARSED_FLIGHTS or TOP_3_FLIGHTS)[:5]):
+        candidates.append({
+            "id": f.get("airline", "f") + f"_{i}",
+            "price": f.get("price"),
+            "itinerary": f.get("route"),
+            "provider": f.get("airline"),
+            "details": f,
+        })
+    sid = _rand("s_")
+    resp = {"searchId": sid, "status": "completed", "candidates": candidates}
+    _mock["searches"][sid] = resp
+    return resp
+
+
+@app.get("/api/agent/reasoning/{meeting_id}")
+def get_reasoning(meeting_id: str):
+    log = _mock["reasoning"].get(meeting_id, [])
+    return {"meetingId": meeting_id, "log": log}
+
+
+@app.get("/api/bookings/{booking_id}")
+def get_booking(booking_id: str):
+    if booking_id in _mock["bookings"]:
+        return _mock["bookings"][booking_id]
+    raise HTTPException(status_code=404, detail="booking not found")
+
+
+@app.post("/api/bookings")
+def post_booking(body: Dict[str, Any]):
+    # body may contain candidate_id, meeting_id, user_info
+    candidate_id = body.get("candidate_id") or body.get("candidateId")
+    meeting_id = body.get("meeting_id") or body.get("meetingId")
+    b_id = _rand("b_")
+    confirmation = _rand("C-")
+    booking = {"bookingId": b_id, "status": "confirmed", "confirmationNumber": confirmation, "itinerary": {"candidate_id": candidate_id}, "meeting_id": meeting_id}
+    _mock["bookings"][b_id] = booking
+    return booking
+
+
+
+@app.post("/api/agent/rag")
+def rag_lookup(payload: Dict[str, Any]):
+    """Call agent.fetch_from_rag to get RAG hints for a query. Expects {'query': '...'}"""
+    try:
+        agent = _lazy_import_agent()
+    except Exception:
+        tb = traceback.format_exc()
+        raise HTTPException(status_code=500, detail={"error": "Failed to import agent module", "trace": tb})
+
+    if hasattr(agent, "fetch_from_rag"):
+        try:
+            q = payload.get("query") if isinstance(payload, dict) else None
+            return agent.fetch_from_rag(q or "")
+        except Exception:
+            tb = traceback.format_exc()
+            raise HTTPException(status_code=500, detail={"error": "RAG failed", "trace": tb})
+    else:
+        raise HTTPException(status_code=501, detail="Agent does not expose fetch_from_rag")
+
+
+@app.post("/api/agent/book")
+def create_booking(req: BookingRequest):
+    """Placeholder booking endpoint.
+
+    The agent/booking flow is application-specific. This endpoint simply echoes
+    a confirmation and would be the place to insert DB persistence or calls to
+    downstream booking/procurement services.
+    """
+    # In a real app you'd persist booking and return the record ID.
+    return {
+        "status": "ok",
+        "booking_id": f"bk_{req.candidate_id}_{req.meeting_id or 'nomtg'}",
+        "candidate_id": req.candidate_id,
+        "meeting_id": req.meeting_id,
+        "user_info": req.user_info,
+    }
+  
+  
 class SignupRequest(BaseModel):
     email: EmailStr
     name: str
@@ -46,261 +371,6 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
-class AirportLocation(BaseModel):
-    code: str
-    label: Optional[str] = None
-
-class StayRange(BaseModel):
-    minDays: int
-    maxDays: int
-
-class ArriveBeforeDays(BaseModel):
-    min: int
-    max: int
-
-class EventResponse(BaseModel):
-    id: str
-    title: str
-    location: str
-    start: str
-    organizer: str
-    rawEmailId: str
-    processed: bool = False
-
-from pydantic import BaseModel, ConfigDict
-
-class EssentialInfoResponse(BaseModel):
-    meetingId: str
-    from_location: AirportLocation
-    to_location: AirportLocation
-    travel_class: str = "economy"
-    tripType: str = "round-trip"
-    stayRange: StayRange
-    arriveBeforeDays: ArriveBeforeDays
-
-    model_config = ConfigDict(from_attributes=True, alias_generator=lambda s: {"from_location": "from", "to_location": "to"}.get(s, s))
-
-
-class EssentialInfoRequest(BaseModel):
-    from_location: AirportLocation
-    to_location: AirportLocation
-    travel_class: str = "economy"
-    tripType: str = "round-trip"
-    stayRange: StayRange
-    arriveBeforeDays: ArriveBeforeDays
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-        alias_generator=lambda s: {"from_location": "from", "to_location": "to"}.get(s, s)
-    )
-
-class ConfirmResponse(BaseModel):
-    taskId: str
-    meetingId: str
-    status: str = "accepted"
-    message: str = "Agent planning started"
-
-class ReasoningLog(BaseModel):
-    ts: str
-    type: str
-    text: str
-    meta: Optional[Dict[str, Any]] = {}
-
-class ReasoningResponse(BaseModel):
-    meetingId: str
-    log: List[ReasoningLog]
-
-class FlightCandidate(BaseModel):
-    id: str
-    price: float
-    itinerary: str
-    provider: str
-    duration: Optional[str] = None
-    departure_time: Optional[str] = None
-    arrival_time: Optional[str] = None
-
-class FlightSearchRequest(BaseModel):
-    meetingId: str
-    departure: str
-    arrival: str
-    date: str
-    returnDate: Optional[str] = None
-    travel_class: str = "economy"
-    budget: Optional[float] = None
-
-class FlightSearchResponse(BaseModel):
-    searchId: str
-    status: str
-    candidates: List[FlightCandidate]
-
-class BookingResponse(BaseModel):
-    bookingId: str
-    status: str
-    confirmationNumber: str
-    itinerary: Dict[str, Any]
-
-# -----------------------
-# JWT Utils
-# -----------------------
-def create_token(user_id: int, email: str) -> str:
-    payload = {
-        "sub": str(user_id),
-        "email": email,
-        "exp": datetime.utcnow() + timedelta(hours=TOKEN_EXPIRE_HOURS),
-        "iat": datetime.utcnow()
-    }
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
-def verify_token(token: str) -> dict:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-def get_current_user(session_token: Optional[str] = Cookie(None)) -> dict:
-    if not session_token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    payload = verify_token(session_token)
-    return {"user_id": int(payload["sub"]), "email": payload["email"]}
-
-# -----------------------
-# DB Helpers
-# -----------------------
-def get_user_by_email(email: str):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("SELECT userid, email, name FROM users WHERE email = %s", (email,))
-        user = cur.fetchone()
-        if user:
-            return {"userid": user[0], "email": user[1], "name": user[2]}
-        return None
-    finally:
-        cur.close()
-        conn.close()
-
-def create_user(email: str, name: str):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute(
-            "INSERT INTO users (email, name, password) VALUES (%s, %s, %s) RETURNING userid",
-            (email, name, "temp")
-        )
-        user_id = cur.fetchone()[0]
-        conn.commit()
-        return user_id
-    finally:
-        cur.close()
-        conn.close()
-
-def get_events_for_user(user_id: int) -> List[Dict]:
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            SELECT emailid, header, body, sender
-            FROM emails
-            ORDER BY emailid DESC
-        """)
-        events = []
-        for row in cur.fetchall():
-            events.append({
-                "id": f"evt_{row[0]}",
-                "title": row[1] or "Untitled Meeting",
-                "location": extract_location(row[2] or ""),
-                "start": datetime.utcnow().isoformat() + "Z",
-                "organizer": row[3],
-                "rawEmailId": f"gmail_msg_{row[0]}",
-                "processed": False
-            })
-        return events
-    finally:
-        cur.close()
-        conn.close()
-
-def extract_location(text: str) -> str:
-    cities = ["amsterdam", "new york", "london", "paris", "tokyo", "delhi", "atlanta"]
-    text_lower = text.lower()
-    for c in cities:
-        if c in text_lower:
-            return c.title()
-    return "Unknown"
-
-def save_session(user_id: int, prefs: dict) -> int:
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            INSERT INTO sessions (userid, user_preferences)
-            VALUES (%s, %s::jsonb)
-            RETURNING sessionid
-        """, (user_id, json.dumps(prefs)))
-        session_id = cur.fetchone()[0]
-        conn.commit()
-        return session_id
-    finally:
-        cur.close()
-        conn.close()
-
-def save_flight_booking(user_id: int, flight_data: dict) -> int:
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            INSERT INTO flights (userid, departure, arrival, currency, price, airline)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING flightid
-        """, (
-            user_id,
-            flight_data.get("departure"),
-            flight_data.get("arrival"),
-            flight_data.get("currency", "USD"),
-            flight_data.get("price"),
-            flight_data.get("airline")
-        ))
-        flight_id = cur.fetchone()[0]
-        conn.commit()
-        return flight_id
-    finally:
-        cur.close()
-        conn.close()
-
-def get_user_by_email(email: str):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("SELECT userid, email, name, password FROM users WHERE email = %s", (email,))
-        row = cur.fetchone()
-        if row:
-            return {"userid": row[0], "email": row[1], "name": row[2], "password": row[3]}
-        return None
-    finally:
-        cur.close()
-        conn.close()
-
-def create_user(email: str, name: str, password: str):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute(
-            "INSERT INTO users (email, name, password) VALUES (%s, %s, %s) RETURNING userid",
-            (email, name, password)
-        )
-        user_id = cur.fetchone()[0]
-        conn.commit()
-        return user_id
-    finally:
-        cur.close()
-        conn.close()
-
-
-# -----------------------
-# Routes
-# -----------------------
 @app.post("/api/auth/signup")
 def signup(req: SignupRequest, response: Response):
     existing_user = get_user_by_email(req.email)
@@ -322,90 +392,3 @@ def login(req: LoginRequest, response: Response):
     response.set_cookie("session_token", token, httponly=True, max_age=TOKEN_EXPIRE_HOURS*3600, samesite="lax")
     return {"message": "Login successful", "user": {"userid": user["userid"], "email": user["email"], "name": user["name"]}}
 
-@app.post("/api/auth/logout")
-def logout(response: Response):
-    response.delete_cookie("session_token")
-    return {"message": "Logged out"}
-
-@app.get("/api/events", response_model=List[EventResponse])
-def list_events(current_user: dict = Depends(get_current_user)):
-    return get_events_for_user(current_user["user_id"])
-
-@app.get("/api/meetings/{meeting_id}/essential", response_model=EssentialInfoResponse)
-def get_essential_info(meeting_id: str, current_user: dict = Depends(get_current_user)):
-    return EssentialInfoResponse(
-        meetingId=meeting_id,
-        from_location=AirportLocation(code="JFK", label="John F. Kennedy (JFK)"),
-        to_location=AirportLocation(code="AMS", label="Amsterdam (AMS)"),
-        travel_class="business",
-        tripType="round-trip",
-        stayRange=StayRange(minDays=2, maxDays=5),
-        arriveBeforeDays=ArriveBeforeDays(min=0, max=1)
-    )
-
-@app.post("/api/meetings/{meeting_id}/essential/confirm", response_model=ConfirmResponse, status_code=202)
-def confirm_essential_info(meeting_id: str, info: EssentialInfoRequest, current_user: dict = Depends(get_current_user)):
-    prefs = {
-        "from": info.from_location.code,
-        "to": info.to_location.code,
-        "class": info.travel_class,
-        "tripType": info.tripType,
-        "stayRange": info.stayRange.dict(),
-        "arriveBeforeDays": info.arriveBeforeDays.dict()
-    }
-    session_id = save_session(current_user["user_id"], prefs)
-    task_id = f"agent_task_{session_id}"
-    return ConfirmResponse(taskId=task_id, meetingId=meeting_id)
-
-@app.get("/api/agent/reasoning/{meeting_id}", response_model=ReasoningResponse)
-def get_reasoning(meeting_id: str, current_user: dict = Depends(get_current_user)):
-    log = [
-        ReasoningLog(ts=datetime.utcnow().isoformat()+"Z", type="step", text="Prefill origin detected: JFK", meta={"confidence": 0.92}),
-        ReasoningLog(ts=(datetime.utcnow()+timedelta(seconds=70)).isoformat()+"Z", type="stage", text="Searching flights")
-    ]
-    return ReasoningResponse(meetingId=meeting_id, log=log)
-
-@app.post("/api/flights/search", response_model=FlightSearchResponse)
-def search_flights(search: FlightSearchRequest, current_user: dict = Depends(get_current_user)):
-    # Mock flights for demo
-    candidates = [
-        FlightCandidate(id="f_1", price=1450.0, itinerary=f"{search.departure}->{search.arrival} 1 stop", provider="AirX"),
-        FlightCandidate(id="f_2", price=1520.0, itinerary=f"{search.departure}->{search.arrival} Non-stop", provider="FlyFast")
-    ]
-    search_id = f"s_{int(datetime.utcnow().timestamp())}"
-    return FlightSearchResponse(searchId=search_id, status="completed", candidates=candidates)
-
-@app.post("/api/flights/book")
-def book_flight(flight_data: Dict[str, Any], current_user: dict = Depends(get_current_user)):
-    flight_id = save_flight_booking(current_user["user_id"], flight_data)
-    return {"bookingId": f"b_{flight_id}", "status": "pending", "message": "Booking initiated"}
-
-@app.get("/api/bookings/{booking_id}", response_model=BookingResponse)
-def get_booking(booking_id: str, current_user: dict = Depends(get_current_user)):
-    flight_id = int(booking_id.replace("b_", ""))
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("SELECT flightid, departure, arrival, price, airline, currency FROM flights WHERE flightid=%s AND userid=%s", (flight_id, current_user["user_id"]))
-        flight = cur.fetchone()
-        if not flight:
-            raise HTTPException(status_code=404, detail="Booking not found")
-        return BookingResponse(
-            bookingId=booking_id,
-            status="confirmed",
-            confirmationNumber=f"CONF{flight[0]:06d}",
-            itinerary={
-                "departure": flight[1],
-                "arrival": flight[2],
-                "price": float(flight[3]),
-                "airline": flight[4],
-                "currency": flight[5]
-            }
-        )
-    finally:
-        cur.close()
-        conn.close()
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
