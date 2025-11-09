@@ -149,90 +149,80 @@ def get_user_preferences(state: MessagesState):
     preferences_dict = {"preferences_text": str(user_input)}
     chain.update_state(config, preferences_dict, as_node="ask_preferences")
     return preferences_dict
-
 def parse_user_emails_node(state: MessagesState):
     """
-    Fetches emails for a user, checks if any are invitations,
-    parses them using LLM, writes structured info to the DB,
-    and returns all parsed invitations for frontend use.
+    Fetches all emails for a user, uses LLM to determine which are invitations,
+    parses only those, updates the DB flag, and returns parsed invitations.
     """
     try:
-        from db import fetch_user_emails_from_db
-        from db import write_parsed_email_to_db
+        from db import fetch_user_emails_from_db, write_parsed_email_to_db
     except Exception as e:
         print(f"❌ Failed to import DB functions: {e}")
         return {"parsed_invitations": []}
 
+    user_email = input("📧 Enter your signed-in email: ").strip()
+    if not user_email:
+        print("⚠️ No email entered. Skipping email parsing.")
+        return {"parsed_invitations": []}
+
+    # Fetch all emails for the user
     try:
-        user_email = input("📧 Enter your signed-in email: ").strip()
-        if not user_email:
-            print("⚠️ No email entered. Skipping email parsing.")
-            return {"parsed_invitations": []}
+        emails = fetch_user_emails_from_db(user_email)
+    except Exception as db_error:
+        print(f"❌ Database fetch error: {db_error}")
+        return {"parsed_invitations": []}
 
-        # Fetch emails from DB
+    if not emails:
+        print("📭 No emails found for this user.")
+        return {"parsed_invitations": []}
+
+    print(f"📬 Found {len(emails)} emails. Checking for invitations...")
+
+    parsed_invitations = []
+
+    for email in emails:
         try:
-            emails = fetch_user_emails_from_db(user_email)
-        except Exception as db_error:
-            print(f"❌ Database fetch error: {db_error}")
-            return {"parsed_invitations": []}
+            text = f"{email.get('header', '')} {email.get('body', '')}".strip()
 
-        if not emails:
-            print("📭 No emails found for this user.")
-            return {"parsed_invitations": []}
+            # Use LLM to detect & parse invitation emails
+            prompt = f"""
+Decide if the following email is a meeting/event invitation.
+If it is, extract event details. Return valid JSON only in this format:
 
-        print(f"📬 Found {len(emails)} emails. Checking for invitations...")
-
-        parsed_invitations = []
-        emails_to_check = emails[:5]  # limit processing
-
-        for email in emails_to_check:
-            try:
-                text = f"{email.get('header', '')} {email.get('body', '')}".lower()
-
-                # Detect invitation-type emails
-                if any(word in text for word in ["invite", "invitation", "meeting", "event", "conference"]):
-                    print(f"\n📨 Invitation found: {email.get('header', 'No Subject')}")
-                    prompt = f"""
-Extract event details from this invitation email.
-Email content:
-{email.get('header', '')} - {email.get('body', '')}
-Return valid JSON only in this format:
 {{
+  "is_invitation": true|false,
   "event_title": "<title>",
   "event_location": "<location or city if mentioned>",
   "event_time": "<time/date if available>"
 }}
+
+Email content:
+{text}
 """
-                    try:
-                        response = llm.invoke([HumanMessage(content=prompt)]).content
-                        cleaned = re.sub(r'```json\s*|\s*```', '', response).strip()
-                        parsed = json.loads(cleaned)
+            response = llm.invoke([HumanMessage(content=prompt)]).content
+            cleaned = re.sub(r'```json\s*|\s*```', '', response).strip()
+            parsed = json.loads(cleaned)
 
-                        # Add emailid reference and save to DB
-                        parsed["emailid"] = email.get("emailid")
-                        write_parsed_email_to_db(email.get("emailid"), parsed)
+            # Only process if LLM determined it is an invitation
+            if parsed.get("is_invitation"):
+                parsed["emailid"] = email.get("emailid")
+                write_parsed_email_to_db(email.get("emailid"), parsed)
 
-                        parsed_invitations.append(parsed)
-                        print(f"✅ Parsed and stored event: {parsed}")
+                parsed_invitations.append(parsed)
+                print(f"✅ Parsed invitation: {parsed.get('event_title', 'No Title')}")
 
-                    except json.JSONDecodeError:
-                        print("⚠️ LLM returned invalid JSON, skipping this email.")
-                    except Exception as e:
-                        print(f"⚠️ Error while parsing/writing email {email.get('emailid')}: {e}")
-                else:
-                    print(f"📨 Skipping non-invitation email: {email.get('header', 'No Subject')}")
-            except Exception as inner_err:
-                print(f"⚠️ Error while processing an email: {inner_err}")
+            else:
+                print(f"📨 Skipped non-invitation email: {email.get('header', 'No Subject')}")
 
-        print(f"✅ Checked {len(emails)} emails. Found {len(parsed_invitations)} invitations.")
-        for invitation in parsed_invitations[:2]:
-            print(f"✅ Parsed invitation: {invitation}")
-        # Return the structured parsed invitations list
-        return {"parsed_invitations": parsed_invitations}
+        except json.JSONDecodeError:
+            print(f"⚠️ LLM returned invalid JSON for email {email.get('emailid')}, skipping.")
+        except Exception as e:
+            print(f"⚠️ Error processing email {email.get('emailid')}: {e}")
 
-    except Exception as e:
-        print(f"💥 Unexpected error in parse_user_emails_node: {e}")
-        return {"parsed_invitations": []}
+    print(parsed_invitations[:3])
+
+    print(f"✅ Completed parsing. Total invitations parsed: {len(parsed_invitations)}")
+    return {"parsed_invitations": parsed_invitations}
 
 
 

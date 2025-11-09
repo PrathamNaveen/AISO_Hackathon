@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     sessionids INTEGER[],  
-    flightid INTEGER,      
+    flightid INTEGER,
     bookings INTEGER DEFAULT 0
 );
 
@@ -121,4 +121,16 @@ SELECT * FROM flights;
 -- List all sessions
 SELECT * FROM sessions;
 
+------------------------------------------------------------------------------------------------------------------------------------
+
 -- Join example: user sessions with emails and flights
+ALTER TABLE emails
+ADD COLUMN is_invitation BOOLEAN DEFAULT FALSE;
+
+-- Example: marking an email as an invitation
+UPDATE emails
+SET is_invitation = TRUE
+WHERE emailid = 3;
+
+SELECT * FROM emails
+WHERE is_invitation = TRUE;
