@@ -105,25 +105,27 @@ def rag_node(state):
 
 
 def flight_data_node(state):
-    rag_info = state.get("rag_data", {})
-    user_text = state.get("preferences_text", "")
-    combined_info = {**rag_info, "user_query": user_text}
+    # rag_info = state.get("rag_data", {})
+    # user_text = state.get("preferences_text", "")
+    # combined_info = {**rag_info, "user_query": user_text}
     flights = fetch_flight_data_from_serpapi()
     return {"flights": flights}
 
 
 def compute_best_flight(state):
     best = random.choice(state["flights"]) if state.get("flights") else None
+    # get best flighst form the API
     return {"best_flight": best}
 
 
 def display_flights(state):
+    print("here u see the flights")
     flights = state.get("flights", [])
     if not flights:
         print("❌ No flights found. Try again.")
         return {"user_choice": "no"}
 
-    print("\n🧾 Top 3 available flights:")
+    # print("\n🧾 Top 3 available flights:")
     for i, f in enumerate(flights, start=1):
         print(f"{i}. {f['airline']} - ${f['price']} - {f['duration']} - {f['route']}")
     choice = input("\nWould you like to book one of these? (yes/no): ").strip().lower()
@@ -191,4 +193,4 @@ chain = workflow.compile()
 if __name__ == "__main__":
     print("🚀 Starting Flight Finder Agent (LangGraph v0.1+)...\n")
     final_state = chain.invoke({})
-    print("\n🏁 Final state:", final_state)
+    # print("\n🏁 Final state:", final_state)

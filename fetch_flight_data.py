@@ -108,14 +108,14 @@ def fetch_flight_data_from_serpapi(
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(flights_data, f, indent=4, ensure_ascii=False)
 
-    print(f"✅ Flight data saved to {output_file}")
-    print(f"📊 Found {len(flights_data['best_flights'])} best flight(s) and {len(flights_data['other_flights'])} other flight(s)")
+    # print(f"✅ Flight data saved to {output_file}")
+    print(f"📊 Found {len(flights_data['best_flights']) + len(flights_data['other_flights'])} flights available!")
     
     # Parse and return essential attributes if requested
     if parse_only_essentials:
         all_flights = flights_data.get('best_flights', []) + flights_data.get('other_flights', [])
         parsed_flights = _parse_flight_data(all_flights)
-        print(f"✈️ Parsed {len(parsed_flights)} flights with essential attributes")
+        # print(f"✈️ Parsed {len(parsed_flights)} flights with essential attributes")
         return parsed_flights
     else:
         return flights_data
@@ -134,7 +134,7 @@ if __name__ == "__main__":
         parse_only_essentials=True
     )
     
-    print("\n✈️ Parsed Flight Data (Top 3):")
+    # print("\n✈️ Parsed Flight Data (Top 3):")
     for i, flight in enumerate(parsed_flights, 1):
         print(f"\n{i}. {flight['airline']} - ${flight['price']}")
         print(f"   Route: {flight['route']}")

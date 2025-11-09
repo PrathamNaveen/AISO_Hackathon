@@ -75,7 +75,7 @@
             "price": 1096,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ3hMVERZME1YeEVUREl4T1RBYUN3aWMyQVlRQWhvRFJWVlNPQnh3emQ0SCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIkpGSyIsbnVsbCwiS0wiLCI2NDEiXSxbIkpGSyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiMjE5MCJdXV0="
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ3hMVERZME1YeEVUREl4T1RBYUN3aWMyQVlRQWhvRFJWVlNPQnh3emQ0SCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIkpGSyIsbnVsbCwiS0wiLCI2NDEiXSxbIkpGSyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiMjE5MCJdXV0="
         },
         {
             "flights": [
@@ -118,7 +118,7 @@
             "price": 1140,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ1ZMVERZeU14b0xDTUQ2QmhBQ0dnTkZWVkk0SEhDaWhnZz0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIktMIiwiNjIzIl1dXQ=="
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ1ZMVERZeU14b0xDTUQ2QmhBQ0dnTkZWVkk0SEhDaWhnZz0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIktMIiwiNjIzIl1dXQ=="
         },
         {
             "flights": [
@@ -164,7 +164,7 @@
             "price": 1140,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ1JFVERjekdnc0l3UG9HRUFJYUEwVlZVamdjY0tLR0NBPT0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiNzMiXV1d"
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ1JFVERjekdnc0l3UG9HRUFJYUEwVlZVamdjY0tLR0NBPT0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiNzMiXV1d"
         },
         {
             "flights": [
@@ -209,7 +209,7 @@
             "price": 1140,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ1JFVERjMUdnc0l3UG9HRUFJYUEwVlZVamdjY0tLR0NBPT0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiNzUiXV1d"
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ1JFVERjMUdnc0l3UG9HRUFJYUEwVlZVamdjY0tLR0NBPT0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiNzUiXV1d"
         },
         {
             "flights": [
@@ -252,7 +252,7 @@
             "price": 1140,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/KL.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ1ZMVERZeU1Sb0xDTUQ2QmhBQ0dnTkZWVkk0SEhDaWhnZz0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIktMIiwiNjIxIl1dXQ=="
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ1ZMVERZeU1Sb0xDTUQ2QmhBQ0dnTkZWVkk0SEhDaWhnZz0iLFtbIkFNUyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIktMIiwiNjIxIl1dXQ=="
         }
     ],
     "other_flights": [
@@ -327,7 +327,7 @@
             "price": 1088,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/B6.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ3BDTmpNeWZFSTJOamszR2dzSWdOSUdFQUlhQTBWVlVqZ2NjTFRYQnc9PSIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIkJPUyIsbnVsbCwiQjYiLCIzMiJdLFsiQk9TIiwiMjAyNS0xMi0yNSIsIkFUTCIsbnVsbCwiQjYiLCI2OTciXV1d"
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ3BDTmpNeWZFSTJOamszR2dzSWdOSUdFQUlhQTBWVlVqZ2NjTFRYQnc9PSIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIkJPUyIsbnVsbCwiQjYiLCIzMiJdLFsiQk9TIiwiMjAyNS0xMi0yNSIsIkFUTCIsbnVsbCwiQjYiLCI2OTciXV1d"
         },
         {
             "flights": [
@@ -404,7 +404,7 @@
             "price": 1096,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ3hMVERZME0zeEVUREl5T1RNYUN3aWMyQVlRQWhvRFJWVlNPQnh3emQ0SCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIkpGSyIsbnVsbCwiS0wiLCI2NDMiXSxbIkpGSyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiMjI5MyJdXV0="
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ3hMVERZME0zeEVUREl5T1RNYUN3aWMyQVlRQWhvRFJWVlNPQnh3emQ0SCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIkpGSyIsbnVsbCwiS0wiLCI2NDMiXSxbIkpGSyIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIkRMIiwiMjI5MyJdXV0="
         },
         {
             "flights": [
@@ -483,7 +483,7 @@
             "price": 1119,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/UA.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ3hWUVRrME4zeFZRVE0yTVRnYUN3anc2UVlRQWhvRFJWVlNPQnh3aFBNSCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIklBRCIsbnVsbCwiVUEiLCI5NDciXSxbIklBRCIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIlVBIiwiMzYxOCJdXV0="
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ3hWUVRrME4zeFZRVE0yTVRnYUN3anc2UVlRQWhvRFJWVlNPQnh3aFBNSCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIklBRCIsbnVsbCwiVUEiLCI5NDciXSxbIklBRCIsIjIwMjUtMTItMjUiLCJBVEwiLG51bGwsIlVBIiwiMzYxOCJdXV0="
         },
         {
             "flights": [
@@ -558,7 +558,7 @@
             "price": 1119,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ3hCUVRJd00zeEJRVFV3TlRFYUN3anc2UVlRQWhvRFJWVlNPQnh3aFBNSCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIlBITCIsbnVsbCwiQUEiLCIyMDMiXSxbIlBITCIsIjIwMjUtMTItMjYiLCJBVEwiLG51bGwsIkFBIiwiNTA1MSJdXV0="
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ3hCUVRJd00zeEJRVFV3TlRFYUN3anc2UVlRQWhvRFJWVlNPQnh3aFBNSCIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIlBITCIsbnVsbCwiQUEiLCIyMDMiXSxbIlBITCIsIjIwMjUtMTItMjYiLCJBVEwiLG51bGwsIkFBIiwiNTA1MSJdXV0="
         },
         {
             "flights": [
@@ -638,7 +638,7 @@
             "price": 1123,
             "type": "Round trip",
             "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
-            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlJqWXlTbmRDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjRVk0UWtKNlprdEJFZ3RFVERreGZFUk1NVGMwTWhvTENLanRCaEFDR2dORlZWSTRISENCOXdjPSIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIk1DTyIsbnVsbCwiREwiLCI5MSJdLFsiTUNPIiwiMjAyNS0xMi0yNSIsIkFUTCIsbnVsbCwiREwiLCIxNzQyIl1dXQ=="
+            "departure_token": "WyJDalJJVWpsS1ZHUXdSR0ZvVEhkQlIwTkxiVUZDUnkwdExTMHRMUzB0TFhsc1pYa3lNa0ZCUVVGQlIydFFjM0ozU1VWSE5HdEJFZ3RFVERreGZFUk1NVGMwTWhvTENLanRCaEFDR2dORlZWSTRISENCOXdjPSIsW1siQU1TIiwiMjAyNS0xMi0yNSIsIk1DTyIsbnVsbCwiREwiLCI5MSJdLFsiTUNPIiwiMjAyNS0xMi0yNSIsIkFUTCIsbnVsbCwiREwiLCIxNzQyIl1dXQ=="
         }
     ]
 }
