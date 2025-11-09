@@ -433,7 +433,59 @@ def run_flight_finder_agent(config: RunnableConfig = {"configurable": {"thread_i
     print("🏁 Agent finished execution.")
     return result
 
+def generate_reasoning_from_state(state: MessagesState):
+    """
+    Takes the current workflow state and asks the LLM to output stepwise reasoning
+    explaining why the selected flights are the best options.
+    """
+    best_flights = state.get("best_flight", [])
+    user_prefs = state.get("preferences_text", "")
+    all_flights = state.get("flights", [])
+
+    if not best_flights or not all_flights:
+        return {"reasoning_steps": ["No flights available to generate reasoning."]}
+
+    flights_text = "\n".join([
+        f"{i+1}. Airline: {f.get('airline', 'N/A')}, Price: ${f.get('price', 'N/A')}, Duration: {f.get('duration', 'N/A')}, Route: {f.get('route', 'N/A')}"
+        for i, f in enumerate(all_flights)
+    ])
+
+    best_flights_text = "\n".join([
+        f"{i+1}. Airline: {f.get('airline', 'N/A')}, Price: ${f.get('price', 'N/A')}, Duration: {f.get('duration', 'N/A')}, Route: {f.get('route', 'N/A')}"
+        for i, f in enumerate(best_flights)
+    ])
+
+    prompt = f"""
+You are a travel assistant. The user preferences are:
+{user_prefs}
+
+All available flights:
+{flights_text}
+
+The selected top flights are:
+{best_flights_text}
+
+Explain, step by step, why each of the selected flights is the best choice for the user.
+Return a JSON object with this structure:
+{{
+  "reasoning_steps": [
+    "<Stepwise reasoning 1>",
+    "<Stepwise reasoning 2>",
+    "<Stepwise reasoning 3>"
+  ]
+}}
+"""
+    try:
+        response = llm.invoke([HumanMessage(content=prompt)]).content
+        cleaned = re.sub(r'```json\s*|\s*```', '', response).strip()
+        reasoning_json = json.loads(cleaned)
+        return reasoning_json
+    except Exception as e:
+        print(f"❌ LLM reasoning generation failed: {e}")
+        return {"reasoning_steps": ["Could not generate reasoning."]}
+
 
 if __name__ == "__main__":
     print("🚀 Starting Flight Finder Agent...\n")
     final_state = chain.invoke({}, config=config)
+    reasoning = generate_reasoning_from_state(final_state)
