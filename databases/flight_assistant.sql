@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- EMAILS TABLE
 CREATE TABLE IF NOT EXISTS emails (
     emailid SERIAL PRIMARY KEY,
+    userid INTEGER REFERENCES users(userid) ON DELETE CASCADE,
     sender VARCHAR(150) NOT NULL,
     header VARCHAR(255),
     body TEXT
@@ -58,14 +59,14 @@ CREATE TABLE IF NOT EXISTS flights (
 -- ===========================================
 
 -- Users
-INSERT INTO users (name, password, email, sessionids, bookings)
+INSERT INTO users (name, password, userid, email, sessionids, bookings)
 VALUES 
-('Pratham', 'hashed_pwd_123', 'pratham@example.com', ARRAY[1,2], 2)
+('Pratham', 'hashed_pwd_123', 1,'pratham@example.com', ARRAY[1,2], 2)
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO users (name, password, email, sessionids, bookings)
 VALUES 
-('Aisha', 'hashed_pwd_456', 'aisha@example.com', ARRAY[3], 1)
+('Aisha', 'hashed_pwd_456', 2, 'aisha@example.com', ARRAY[3], 1)
 ON CONFLICT (email) DO NOTHING;
 
 -- Emails

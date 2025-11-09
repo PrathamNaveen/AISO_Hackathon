@@ -13,8 +13,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.store.memory import InMemoryStore  
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from fetch_flight_data import fetch_flight_data_from_api
-from message import fetch_flight_data_from_serpapi
+from AISO_Hackathon.fetch_flight_data import fetch_flight_data_from_serpapi
 
 # -------------------------------
 # Load environment

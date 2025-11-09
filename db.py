@@ -23,8 +23,7 @@ def fetch_user_emails_from_db(user_email: str):
     query = """
         SELECT e.emailid, e.sender, e.header, e.body
         FROM emails e
-        JOIN sessions s ON e.emailid = s.emailid
-        JOIN users u ON s.userid = u.userid
+        JOIN users u ON e.userid = u.userid
         WHERE u.email = %s;
     """
     cur.execute(query, (user_email,))
@@ -52,6 +51,30 @@ def write_parsed_email_to_db(emailid: int, parsed_data: dict):
         print(f"✅ Parsed data written for email ID {emailid}")
     except Exception as e:
         print("❌ Failed to write parsed email data:", e)
+    finally:
+        cur.close()
+        conn.close()
+
+def insert_email(sender: str, header: str, body: str, date=None):
+    """
+    Inserts a new email into the emails table.
+    Optionally, you could store the date if you add a column later.
+    """
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        query = """
+            INSERT INTO emails (sender, header, body, userid)
+            VALUES (%s, %s, %s, 3)
+            RETURNING emailid;
+        """
+        cur.execute(query, (sender, header, body))
+        emailid = cur.fetchone()[0]
+        conn.commit()
+        print(f"✅ Email stored with ID: {emailid}")
+        return emailid
+    except Exception as e:
+        print(f"❌ Failed to insert email: {e}")
     finally:
         cur.close()
         conn.close()
