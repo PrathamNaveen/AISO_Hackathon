@@ -23,27 +23,41 @@ export default function EssentialInfo({
     }
     setLoading(true);
     fetchEssential(meetingId)
-      .then((d) => setData(d))
+      .then((d: any) => {
+        // normalize legacy shapes to new keys
+        if (d?.departure_airport || d?.departure_airport === '') {
+          setData({
+            meetingId: d.meetingId ?? meetingId,
+            departure_airport: d.departure_airport ?? d.from?.code ?? '',
+            arrival_airport: d.arrival_airport ?? d.to?.code ?? '',
+            class: (d.class ?? d.travelClass) ?? 'economy',
+            trip_type: d.trip_type ?? d.tripType ?? 'round-trip',
+            days: d.days ?? d.stayRange?.maxDays ?? 3,
+            currency: d.currency ?? null,
+            budget: d.budget ?? null,
+            outbound_date: d.outbound_date ?? null,
+          });
+        } else {
+          // legacy shape
+          setData({
+            meetingId: d?.meetingId ?? meetingId,
+            departure_airport: d?.from?.code ?? '',
+            arrival_airport: d?.to?.code ?? '',
+            class: d?.class ?? 'economy',
+            trip_type: d?.tripType ?? 'round-trip',
+            days: d?.stayRange?.maxDays ?? 3,
+            currency: d?.currency ?? null,
+            budget: d?.budget ?? null,
+            outbound_date: d?.outbound_date ?? null,
+          });
+        }
+      })
       .catch((err) => setError(String(err)))
       .finally(() => setLoading(false));
   }, [meetingId]);
 
   function update<K extends keyof EssentialInfo>(key: K, value: any) {
     setData((prev) => (prev ? { ...prev, [key]: value } : prev));
-  }
-
-  function updateNested(path: string, value: any) {
-    setData((prev) => {
-      if (!prev) return prev;
-      const copy = JSON.parse(JSON.stringify(prev));
-      const parts = path.split('.');
-      let cur: any = copy;
-      for (let i = 0; i < parts.length - 1; i++) {
-        cur = cur[parts[i]];
-      }
-      cur[parts[parts.length - 1]] = value;
-      return copy;
-    });
   }
 
   async function handleConfirm() {
@@ -76,8 +90,8 @@ export default function EssentialInfo({
     }
   }
 
-  if (!meetingId) return <div className="p-2">Select a meeting to view essential info</div>;
-  if (loading || !data) return <div className="p-2">Loading essential info...</div>;
+  if (!meetingId) return <div className="p-2 text-sm">Select a meeting to view essential info</div>;
+  if (loading || !data) return <div className="p-2 text-sm">Loading essential info...</div>;
 
   return (
     <div className="p-2">
@@ -86,28 +100,38 @@ export default function EssentialInfo({
 
         <div className="space-y-2 text-sm">
           <div>
-            <div className="text-gray-300 font-semibold text-[17px]">From</div>
+            <div className="text-gray-300 font-semibold text-[14px]">Departure (IATA)</div>
             <input
-              value={data.from?.code ?? ''}
-              onChange={(e) => updateNested('from.code', e.target.value)}
+              value={(data.departure_airport as any)?.code ?? (data.departure_airport as any) ?? ''}
+              onChange={(e) =>
+                update(
+                  'departure_airport',
+                  { code: e.target.value.toUpperCase(), label: e.target.value.toUpperCase() }
+                )
+              }
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             />
           </div>
 
           <div>
-            <div className="text-gray-300 font-semibold text-[17px]">To</div>
+            <div className="text-gray-300 font-semibold text-[14px]">Arrival (IATA)</div>
             <input
-              value={data.to?.code ?? ''}
-              onChange={(e) => updateNested('to.code', e.target.value)}
+              value={(data.arrival_airport as any)?.code ?? (data.arrival_airport as any) ?? ''}
+              onChange={(e) =>
+                update(
+                  'arrival_airport',
+                  { code: e.target.value.toUpperCase(), label: e.target.value.toUpperCase() }
+                )
+              }
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             />
           </div>
 
           <div>
-            <div className="text-gray-300 font-semibold text-[17px]">Class</div>
+            <div className="text-gray-300 font-semibold text-[14px]">Class</div>
             <select
               value={data.class}
-              onChange={(e) => update('class', e.target.value)}
+              onChange={(e) => update('class', e.target.value as any)}
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             >
               <option value="economy">Economy</option>
@@ -118,10 +142,10 @@ export default function EssentialInfo({
           </div>
 
           <div>
-            <div className="text-gray-300 font-semibold text-[17px]">Trip type</div>
+            <div className="text-gray-300 font-semibold text-[14px]">Trip type</div>
             <select
-              value={data.tripType}
-              onChange={(e) => update('tripType', e.target.value)}
+              value={data.trip_type ?? (data as any).tripType}
+              onChange={(e) => update('trip_type', e.target.value as any)}
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             >
               <option value="round-trip">Round-trip</option>
@@ -131,44 +155,43 @@ export default function EssentialInfo({
 
           <div className="flex gap-2">
             <div className="flex-1">
-              <div className="text-gray-300 text-sm font-semibold">Stay min</div>
+              <div className="text-gray-300 text-sm font-semibold">Days</div>
               <input
                 type="number"
-                value={data.stayRange?.minDays ?? 1}
-                onChange={(e) => updateNested('stayRange.minDays', Number(e.target.value))}
+                value={data.days ?? 3}
+                onChange={(e) => update('days', Number(e.target.value))}
                 className="w-full p-1 rounded-md text-black text-sm"
               />
             </div>
+
             <div className="flex-1">
-              <div className="text-gray-300 text-sm font-semibold">Stay max</div>
+              <div className="text-gray-300 text-sm font-semibold">Budget</div>
               <input
                 type="number"
-                value={data.stayRange?.maxDays ?? 3}
-                onChange={(e) => updateNested('stayRange.maxDays', Number(e.target.value))}
+                value={data.budget ?? ''}
+                onChange={(e) => update('budget', e.target.value ? Number(e.target.value) : null)}
                 className="w-full p-1 rounded-md text-black text-sm"
               />
             </div>
           </div>
 
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <div className="text-gray-300 text-sm font-semibold">Arrive before min</div>
-              <input
-                type="number"
-                value={data.arriveBeforeDays?.min ?? 0}
-                onChange={(e) => updateNested('arriveBeforeDays.min', Number(e.target.value))}
-                className="w-full p-1 rounded-md text-black text-sm"
-              />
-            </div>
-            <div className="flex-1">
-              <div className="text-gray-300 text-sm font-semibold">Arrive before max</div>
-              <input
-                type="number"
-                value={data.arriveBeforeDays?.max ?? 1}
-                onChange={(e) => updateNested('arriveBeforeDays.max', Number(e.target.value))}
-                className="w-full p-1 rounded-md text-black text-sm"
-              />
-            </div>
+          <div>
+            <div className="text-gray-300 text-sm font-semibold">Currency</div>
+            <input
+              value={data.currency ?? ''}
+              onChange={(e) => update('currency', e.target.value ?? null)}
+              className="w-full p-1 rounded-md mt-1 text-black text-sm"
+            />
+          </div>
+
+          <div>
+            <div className="text-gray-300 text-sm font-semibold">Outbound date</div>
+            <input
+              type="date"
+              value={data.outbound_date ?? ''}
+              onChange={(e) => update('outbound_date', e.target.value ?? null)}
+              className="w-full p-1 rounded-md mt-1 text-black text-sm"
+            />
           </div>
         </div>
 

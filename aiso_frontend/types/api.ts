@@ -16,12 +16,14 @@ export type Airport = {
 
 export type EssentialInfo = {
   meetingId: string;
-  from: Airport;
-  to: Airport;
+  departure_airport: Airport;
+  arrival_airport: Airport;
   class: 'economy' | 'premium_economy' | 'business' | 'first';
-  tripType: 'one-way' | 'round-trip';
-  stayRange: { minDays: number; maxDays: number };
-  arriveBeforeDays: { min: number; max: number };
+  trip_type: 'one-way' | 'round-trip';
+  days: number;
+  currency: string | null ;
+  budget: number | null;
+  outbound_date: string | null;
 };
 
 export type AgentLogItem = {
