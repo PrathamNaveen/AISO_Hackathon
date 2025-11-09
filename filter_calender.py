@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore')
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 
-def get_december_2025_events():
+def get_recent_events():
     """
     Get all events from Google Calendar in December 2025.
     
@@ -210,7 +210,7 @@ def filter_flights(events, flights):
 
 def main():
     """Main function to get and display December 2025 events."""
-    events = get_december_2025_events()
+    events = get_recent_events()
     flights = get_flights()
     filtered_flights = filter_flights(events, flights)
     print("Filtered flights:")

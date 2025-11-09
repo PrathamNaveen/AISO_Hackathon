@@ -1,7 +1,10 @@
 # AISO Hackathon – FlyGiraffe
 
+
 ## Overview
 This project powers a flight-planning copilot that reads meeting signals, understands user preferences, and returns bookable flight options. The stack combines a LangGraph-based agent, Google Workspace integrations (Gmail + Calendar), SerpAPI flight search, a FastAPI backend, and a Next.js dashboard.
+![FlyGiraffe architecture overview](./flyGiraffe.drawio.png)
+
 
 ## Repository Layout
 - `agent.py` – LangGraph workflow that orchestrates email parsing, preference capture, SerpAPI flight search, Google Calendar conflict checks (`filter_calender.py`), LLM ranking, booking decisions, and short-term memory via `InMemorySaver`/`InMemoryStore`.
