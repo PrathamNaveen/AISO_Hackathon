@@ -111,7 +111,7 @@ def compute_best_flight(state: MessagesState):
     ])
 
     prompt = f"""
-You are a travel assistant. Pick the three best flight option based on user preferences and available flights. It should be three json objects.
+You are a travel assistant. Pick the three best flight option based on user preferences and available flights. It should be three json objects
 
 User preferences: {user_prefs}
 
@@ -153,11 +153,31 @@ def display_flights(state: MessagesState):
     return {"user_choice": choice}
 
 def booking_or_repeat(state: MessagesState):
-    if state.get("user_choice") == "yes":
-        print("✅ Proceeding with the booking process...")
-        return {"status": "booking_confirmed"}
+    """Handles user's decision to book or refine search."""
+    choice = state.get("user_choice", "").lower()
+    best_flight = state.get("best_flight")
+
+    if choice == "yes":
+        # Simulate booking
+        if best_flight:
+            print("\n🛫 Booking your flight...")
+            print(f"✈️ Airline: {best_flight.get('airline', 'N/A')}")
+            print(f"💰 Price: ${best_flight.get('price', 'N/A')}")
+            print(f"🕒 Duration: {best_flight.get('duration', 'N/A')}")
+            print(f"🧭 Route: {best_flight.get('route', 'N/A')}")
+            print("✅ Booking confirmed! Have a great trip! 🌍\n")
+            return {"status": "booking_confirmed"}
+        else:
+            print("⚠️ No best flight found. Let's search again.")
+            user_choice = input("Would you like to search again? (yes/no): ").strip().lower()
+            checkpointer.update_state(config, {"user_choice": user_choice})
+            if user_choice == "yes":
+                return {"status": "loop_back"}
+            else:
+                return {"status": "end"}
+
     else:
-        print("🔁 Let's refine your search.")
+        print("\n🔁 Okay, let’s refine your search preferences.\n")
         return {"status": "loop_back"}
 
 # -------------------------------
@@ -179,8 +199,10 @@ workflow.add_edge("ask_preferences", "fetch_flight")
 workflow.add_edge("fetch_flight", "compute_best_flight")
 workflow.add_edge("compute_best_flight", "display")
 workflow.add_edge("display", "decision")
-workflow.add_conditional_edges("decision", lambda s: "ask_preferences" if s.get("status")=="loop_back" else END)
-
+workflow.add_conditional_edges(
+    "decision",
+    lambda s: "ask_preferences" if s.get("status") == "loop_back" else END,
+)
 # -------------------------------
 # Compile & Run
 # -------------------------------
