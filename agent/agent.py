@@ -111,7 +111,7 @@ def compute_best_flight(state: MessagesState):
     ])
 
     prompt = f"""
-You are a travel assistant. Pick the single best flight option based on user preferences and available flights.
+You are a travel assistant. Pick the three best flight option based on user preferences and available flights. It should be three json objects.
 
 User preferences: {user_prefs}
 
