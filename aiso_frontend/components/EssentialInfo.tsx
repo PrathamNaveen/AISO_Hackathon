@@ -32,7 +32,6 @@ export default function EssentialInfo({
   }
 
   function updateNested(path: string, value: any) {
-    // simple helper for nested objects (stayRange, arriveBeforeDays, from/to)
     setData((prev) => {
       if (!prev) return prev;
       const copy = JSON.parse(JSON.stringify(prev));
@@ -53,7 +52,6 @@ export default function EssentialInfo({
     try {
       const res = await confirmEssential(meetingId, data as any);
       if (res?.taskId && onConfirmed) onConfirmed(res.taskId);
-      // show brief feedback (you may wire this to agent SSE)
     } catch (err: any) {
       setError(String(err));
     } finally {
@@ -61,39 +59,39 @@ export default function EssentialInfo({
     }
   }
 
-  if (!meetingId) return <div style={{ padding: 12 }}>Select a meeting to view essential info</div>;
-  if (loading || !data) return <div style={{ padding: 12 }}>Loading essential info...</div>;
+  if (!meetingId) return <div className="p-3">Select a meeting to view essential info</div>;
+  if (loading || !data) return <div className="p-3">Loading essential info...</div>;
 
   return (
-    <div style={{ padding: 12 }}>
-      <div style={{ background: '#666', borderRadius: 12, padding: 12, color: '#fff' }}>
-        <h3 style={{ marginTop: 0 }}>Essential information</h3>
+    <div className="p-3">
+      <div className="bg-gray-600 rounded-lg p-4 text-white">
+        <h3 className="m-0 mb-3 text-lg font-semibold">Essential information</h3>
 
-        <div style={{ marginBottom: 8 }}>
-          <label style={{ fontSize: 12 }}>From</label>
+        <div className="mb-3">
+          <label className="text-sm block">From</label>
           <input
             value={data.from?.code ?? ''}
             onChange={(e) => updateNested('from.code', e.target.value)}
-            style={{ width: '100%', padding: 8, borderRadius: 6, marginTop: 4 }}
+            className="w-full p-2 rounded-md mt-1 text-black"
           />
         </div>
 
-        <div style={{ marginBottom: 8 }}>
-          <label style={{ fontSize: 12 }}>To</label>
+        <div className="mb-3">
+          <label className="text-sm block">To</label>
           <input
             value={data.to?.code ?? ''}
             onChange={(e) => updateNested('to.code', e.target.value)}
-            style={{ width: '100%', padding: 8, borderRadius: 6, marginTop: 4 }}
+            className="w-full p-2 rounded-md mt-1 text-black"
           />
         </div>
 
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 12 }}>Class</label>
+        <div className="flex gap-3 mb-3">
+          <div className="flex-1">
+            <label className="text-sm block">Class</label>
             <select
               value={data.class}
               onChange={(e) => update('class', e.target.value)}
-              style={{ width: '100%', padding: 8, borderRadius: 6, marginTop: 4 }}
+              className="w-full p-2 rounded-md mt-1 text-black"
             >
               <option value="economy">Economy</option>
               <option value="premium_economy">Premium Economy</option>
@@ -102,12 +100,12 @@ export default function EssentialInfo({
             </select>
           </div>
 
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 12 }}>Trip type</label>
+          <div className="flex-1">
+            <label className="text-sm block">Trip type</label>
             <select
               value={data.tripType}
               onChange={(e) => update('tripType', e.target.value)}
-              style={{ width: '100%', padding: 8, borderRadius: 6, marginTop: 4 }}
+              className="w-full p-2 rounded-md mt-1 text-black"
             >
               <option value="round-trip">Round-trip</option>
               <option value="one-way">One-way</option>
@@ -115,58 +113,50 @@ export default function EssentialInfo({
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 12 }}>Stay range (days)</label>
-            <div style={{ display: 'flex', gap: 8 }}>
+        <div className="flex gap-3 mb-3">
+          <div className="flex-1">
+            <label className="text-sm block">Stay range (days)</label>
+            <div className="flex gap-2 mt-1">
               <input
                 type="number"
                 value={data.stayRange.minDays}
                 onChange={(e) => updateNested('stayRange.minDays', Number(e.target.value))}
-                style={{ flex: 1, padding: 8, borderRadius: 6 }}
+                className="flex-1 p-2 rounded-md text-black"
               />
               <input
                 type="number"
                 value={data.stayRange.maxDays}
                 onChange={(e) => updateNested('stayRange.maxDays', Number(e.target.value))}
-                style={{ flex: 1, padding: 8, borderRadius: 6 }}
+                className="flex-1 p-2 rounded-md text-black"
               />
             </div>
           </div>
 
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 12 }}>Arrive before (days)</label>
-            <div style={{ display: 'flex', gap: 8 }}>
+          <div className="flex-1">
+            <label className="text-sm block">Arrive before (days)</label>
+            <div className="flex gap-2 mt-1">
               <input
                 type="number"
                 value={data.arriveBeforeDays.min}
                 onChange={(e) => updateNested('arriveBeforeDays.min', Number(e.target.value))}
-                style={{ flex: 1, padding: 8, borderRadius: 6 }}
+                className="flex-1 p-2 rounded-md text-black"
               />
               <input
                 type="number"
                 value={data.arriveBeforeDays.max}
                 onChange={(e) => updateNested('arriveBeforeDays.max', Number(e.target.value))}
-                style={{ flex: 1, padding: 8, borderRadius: 6 }}
+                className="flex-1 p-2 rounded-md text-black"
               />
             </div>
           </div>
         </div>
 
-        {error && <div style={{ color: 'salmon', marginBottom: 8 }}>{error}</div>}
+        {error && <div className="text-red-300 mb-3">{error}</div>}
 
         <button
           onClick={handleConfirm}
           disabled={saving}
-          style={{
-            marginTop: 8,
-            padding: '8px 14px',
-            background: '#3478f6',
-            color: '#fff',
-            borderRadius: 8,
-            border: 'none',
-            cursor: 'pointer',
-          }}
+          className={`mt-2 px-4 py-2 rounded-md text-white ${saving ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600'}`}
         >
           {saving ? 'Saving...' : 'Confirm'}
         </button>

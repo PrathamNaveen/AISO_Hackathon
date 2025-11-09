@@ -25,12 +25,12 @@ export default function EventsList({ onSelect }: { onSelect: (evt: EventItem) =>
     };
   }, []);
 
-  if (loading) return <div style={{ padding: 12 }}>Loading events...</div>;
-  if (error) return <div style={{ padding: 12, color: 'crimson' }}>Error: {error}</div>;
-  if (events.length === 0) return <div style={{ padding: 12 }}>No events found</div>;
+  if (loading) return <div className="p-3">Loading events...</div>;
+  if (error) return <div className="p-3 text-red-600">Error: {error}</div>;
+  if (events.length === 0) return <div className="p-3">No events found</div>;
 
   return (
-    <div style={{ padding: 12 }}>
+    <div className="p-3">
       {events.map((e) => (
         <div
           key={e.id}

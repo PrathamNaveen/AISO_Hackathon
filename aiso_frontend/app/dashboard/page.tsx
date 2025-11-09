@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import EventsList from '../../components/EventList';
 import EssentialInfo from '../../components/EssentialInfo';
-import ReasoningPanel from '../../components/ReasoningPanel';
 import FlightSearchPanel from '../../components/FlightSearchPanel';
 import type { EventItem } from '../../types/api';
 export default function DashboardPage() {
@@ -11,21 +10,21 @@ export default function DashboardPage() {
   const [agentTaskId, setAgentTaskId] = useState<string | null>(null);
 
   return (
-    <div style={{ display: 'flex', height: '100vh', gap: 12 }}>
+    <div className="flex h-screen gap-3">
       {/* Left column */}
-      <div style={{ width: 320, background: '#222', color: '#fff', overflow: 'auto', paddingTop: 12 }}>
-        <div style={{ padding: '0 12px' }}>
-          <h2>Meetings</h2>
+      <div className="w-80 bg-[#222] text-white overflow-auto pt-3">
+        <div className="px-3">
+          <h2 className="text-[40px] font-semibold py-[10px]">Meetings</h2>
         </div>
         <EventsList onSelect={(e) => setSelected(e)} />
-        <div style={{ padding: 12 }}>
-          <button style={{ padding: '8px 12px', borderRadius: 12, background: '#444', color: '#fff' }}>Log out</button>
+        <div className="p-3">
+          <button className="px-3 py-2 rounded-xl bg-[#444] text-white">Log out</button>
         </div>
       </div>
 
       {/* Middle column */}
-      <div style={{ flex: 1, background: '#3a3636', color: '#fff', overflow: 'auto' }}>
-        <div style={{ padding: 12 }}>
+      <div className="flex-1 bg-[#3a3636] text-white overflow-auto">
+        <div className="p-3">
           <EssentialInfo
             meetingId={selected?.id ?? null}
             onConfirmed={(taskId) => {
@@ -34,30 +33,19 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div style={{ padding: 12 }}>
-          <ReasoningPanel meetingId={selected?.id ?? null} />
-        </div>
       </div>
 
       {/* Right column */}
-      <div style={{ width: 520, background: '#f1f1f1', overflow: 'auto' }}>
-        <div style={{ padding: 12 }}>
-          <h2>Tell us more about your preference</h2>
+      <div className="w-[520px] bg-gray-100 overflow-auto">
+        <div className="p-3">
+          <h2 className="text-xl font-semibold">Tell us more about your preference</h2>
           {/* You can add a small chat or preference UI here */}
         </div>
 
-        <div style={{ padding: 12 }}>
+        <div className="p-3">
           <FlightSearchPanel meetingId={selected?.id ?? null} />
         </div>
 
-        {/* <div style={{ padding: 12 }}>
-          <div style={{ background: '#ddd', padding: 12, borderRadius: 12 }}>
-            <h3>Confirm details</h3>
-            <button style={{ padding: '8px 12px', borderRadius: 8, background: '#3478f6', color: '#fff' }}>
-              Confirm
-            </button>
-          </div>
-        </div> */}
       </div>
     </div>
   );
