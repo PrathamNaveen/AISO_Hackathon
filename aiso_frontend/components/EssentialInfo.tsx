@@ -16,6 +16,7 @@ export default function EssentialInfo({
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
 
+  // Load essential info from backend
   useEffect(() => {
     if (!meetingId) {
       setData(null);
@@ -24,33 +25,18 @@ export default function EssentialInfo({
     setLoading(true);
     fetchEssential(meetingId)
       .then((d: any) => {
-        // normalize legacy shapes to new keys
-        if (d?.departure_airport || d?.departure_airport === '') {
-          setData({
-            meetingId: d.meetingId ?? meetingId,
-            departure_airport: d.departure_airport ?? d.from?.code ?? '',
-            arrival_airport: d.arrival_airport ?? d.to?.code ?? '',
-            class: (d.class ?? d.travelClass) ?? 'economy',
-            trip_type: d.trip_type ?? d.tripType ?? 'round-trip',
-            days: d.days ?? d.stayRange?.maxDays ?? 3,
-            currency: d.currency ?? null,
-            budget: d.budget ?? null,
-            outbound_date: d.outbound_date ?? null,
-          });
-        } else {
-          // legacy shape
-          setData({
-            meetingId: d?.meetingId ?? meetingId,
-            departure_airport: d?.from?.code ?? '',
-            arrival_airport: d?.to?.code ?? '',
-            class: d?.class ?? 'economy',
-            trip_type: d?.tripType ?? 'round-trip',
-            days: d?.stayRange?.maxDays ?? 3,
-            currency: d?.currency ?? null,
-            budget: d?.budget ?? null,
-            outbound_date: d?.outbound_date ?? null,
-          });
-        }
+        // Normalize fields for frontend usage
+        setData({
+          meetingId: d.meetingId ?? meetingId,
+          departure_airport: d.departure_airport ?? d.from?.code ?? '',
+          arrival_airport: d.arrival_airport ?? d.to?.code ?? '',
+          class: d.class ?? 'economy',
+          trip_type: d.trip_type ?? d.tripType ?? 'round-trip',
+          days: d.days ?? d.stayRange?.maxDays ?? 3,
+          currency: d.currency ?? 'USD',
+          budget: d.budget ?? 9999,
+          outbound_date: d.outbound_date ?? null,
+        });
       })
       .catch((err) => setError(String(err)))
       .finally(() => setLoading(false));
@@ -69,11 +55,17 @@ export default function EssentialInfo({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          departure_airport: data.from?.code,
-          arrival_airport: data.to?.code,
-          date: data.date ?? '2025-12-25',
-          days: data.stayRange?.maxDays ?? 10,
-          currency: 'USD',
+          departure_airport:
+            typeof data.departure_airport === 'object'
+              ? data.departure_airport.code
+              : data.departure_airport,
+          arrival_airport:
+            typeof data.arrival_airport === 'object'
+              ? data.arrival_airport.code
+              : data.arrival_airport,
+          date: data.outbound_date ?? '2025-12-25',
+          days: data.days ?? 10,
+          currency: data.currency ?? 'USD',
           budget: data.budget ?? 9999,
         }),
       });
@@ -90,7 +82,8 @@ export default function EssentialInfo({
     }
   }
 
-  if (!meetingId) return <div className="p-2 text-sm">Select a meeting to view essential info</div>;
+  if (!meetingId)
+    return <div className="p-2 text-sm">Select a meeting to view essential info</div>;
   if (loading || !data) return <div className="p-2 text-sm">Loading essential info...</div>;
 
   return (
@@ -102,13 +95,12 @@ export default function EssentialInfo({
           <div>
             <div className="text-gray-300 font-semibold text-[14px]">Departure (IATA)</div>
             <input
-              value={(data.departure_airport as any)?.code ?? (data.departure_airport as any) ?? ''}
-              onChange={(e) =>
-                update(
-                  'departure_airport',
-                  { code: e.target.value.toUpperCase(), label: e.target.value.toUpperCase() }
-                )
+              value={
+                typeof data.departure_airport === 'object'
+                  ? data.departure_airport.code
+                  : data.departure_airport
               }
+              onChange={(e) => update('departure_airport', e.target.value.toUpperCase())}
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             />
           </div>
@@ -116,13 +108,12 @@ export default function EssentialInfo({
           <div>
             <div className="text-gray-300 font-semibold text-[14px]">Arrival (IATA)</div>
             <input
-              value={(data.arrival_airport as any)?.code ?? (data.arrival_airport as any) ?? ''}
-              onChange={(e) =>
-                update(
-                  'arrival_airport',
-                  { code: e.target.value.toUpperCase(), label: e.target.value.toUpperCase() }
-                )
+              value={
+                typeof data.arrival_airport === 'object'
+                  ? data.arrival_airport.code
+                  : data.arrival_airport
               }
+              onChange={(e) => update('arrival_airport', e.target.value.toUpperCase())}
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             />
           </div>
@@ -131,7 +122,7 @@ export default function EssentialInfo({
             <div className="text-gray-300 font-semibold text-[14px]">Class</div>
             <select
               value={data.class}
-              onChange={(e) => update('class', e.target.value as any)}
+              onChange={(e) => update('class', e.target.value)}
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             >
               <option value="economy">Economy</option>
@@ -144,8 +135,8 @@ export default function EssentialInfo({
           <div>
             <div className="text-gray-300 font-semibold text-[14px]">Trip type</div>
             <select
-              value={data.trip_type ?? (data as any).tripType}
-              onChange={(e) => update('trip_type', e.target.value as any)}
+              value={data.trip_type}
+              onChange={(e) => update('trip_type', e.target.value)}
               className="w-full p-1 rounded-md mt-1 text-black text-sm"
             >
               <option value="round-trip">Round-trip</option>
@@ -201,7 +192,9 @@ export default function EssentialInfo({
           <button
             onClick={handleConfirm}
             disabled={saving}
-            className={`px-4 py-1 rounded-full text-white text-sm ${saving ? 'bg-gray-500 cursor-not-allowed' : 'bg-[#8D0101]'}`}
+            className={`px-4 py-1 rounded-full text-white text-sm ${
+              saving ? 'bg-gray-500 cursor-not-allowed' : 'bg-[#8D0101]'
+            }`}
           >
             {saving ? 'Saving...' : 'Confirm'}
           </button>
