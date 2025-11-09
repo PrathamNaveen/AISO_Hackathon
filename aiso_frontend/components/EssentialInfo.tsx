@@ -59,39 +59,40 @@ export default function EssentialInfo({
     }
   }
 
-  if (!meetingId) return <div className="p-3">Select a meeting to view essential info</div>;
-  if (loading || !data) return <div className="p-3">Loading essential info...</div>;
+  if (!meetingId) return <div className="p-2">Select a meeting to view essential info</div>;
+  if (loading || !data) return <div className="p-2">Loading essential info...</div>;
 
   return (
-    <div className="p-3">
-      <div className="bg-gray-600 rounded-lg p-4 text-white">
-        <h3 className="m-0 mb-3 text-lg font-semibold">Essential information</h3>
+    <div className="p-2">
+      {/* smaller stacked box */}
+      <div className="bg-[#FFFFFF]/20 rounded-lg p-3 text-white w-full">
+        <h3 className="text-lg font-semibold text-center mb-3">Essential information</h3>
 
-        <div className="mb-3">
-          <label className="text-sm block">From</label>
-          <input
-            value={data.from?.code ?? ''}
-            onChange={(e) => updateNested('from.code', e.target.value)}
-            className="w-full p-2 rounded-md mt-1 text-black"
-          />
-        </div>
+        <div className="space-y-2 text-sm">
+          <div>
+            <div className="text-gray-300 font-semibold text-[17px]">From</div>
+            <input
+              value={data.from?.code ?? ''}
+              onChange={(e) => updateNested('from.code', e.target.value)}
+              className="w-full p-1 rounded-md mt-1 text-black text-sm"
+            />
+          </div>
 
-        <div className="mb-3">
-          <label className="text-sm block">To</label>
-          <input
-            value={data.to?.code ?? ''}
-            onChange={(e) => updateNested('to.code', e.target.value)}
-            className="w-full p-2 rounded-md mt-1 text-black"
-          />
-        </div>
+          <div>
+            <div className="text-gray-300 font-semibold text-[17px]">To</div>
+            <input
+              value={data.to?.code ?? ''}
+              onChange={(e) => updateNested('to.code', e.target.value)}
+              className="w-full p-1 rounded-md mt-1 text-black text-sm"
+            />
+          </div>
 
-        <div className="flex gap-3 mb-3">
-          <div className="flex-1">
-            <label className="text-sm block">Class</label>
+          <div>
+            <div className="text-gray-300 font-semibold text-[17px]">Class</div>
             <select
               value={data.class}
               onChange={(e) => update('class', e.target.value)}
-              className="w-full p-2 rounded-md mt-1 text-black"
+              className="w-full p-1 rounded-md mt-1 text-black text-sm"
             >
               <option value="economy">Economy</option>
               <option value="premium_economy">Premium Economy</option>
@@ -100,66 +101,72 @@ export default function EssentialInfo({
             </select>
           </div>
 
-          <div className="flex-1">
-            <label className="text-sm block">Trip type</label>
+          <div>
+            <div className="text-gray-300 font-semibold text-[17px]">Trip type</div>
             <select
               value={data.tripType}
               onChange={(e) => update('tripType', e.target.value)}
-              className="w-full p-2 rounded-md mt-1 text-black"
+              className="w-full p-1 rounded-md mt-1 text-black text-sm"
             >
-              <option value="round-trip">Round-trip</option>
+              <option value="round-trip font-semibold">Round-trip</option>
               <option value="one-way">One-way</option>
             </select>
           </div>
-        </div>
 
-        <div className="flex gap-3 mb-3">
-          <div className="flex-1">
-            <label className="text-sm block">Stay range (days)</label>
-            <div className="flex gap-2 mt-1">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <div className="text-gray-300 text-sm font-semibold">Stay min</div>
               <input
                 type="number"
-                value={data.stayRange.minDays}
+                value={data.stayRange?.minDays ?? 1}
                 onChange={(e) => updateNested('stayRange.minDays', Number(e.target.value))}
-                className="flex-1 p-2 rounded-md text-black"
+                className="w-full p-1 rounded-md text-black text-sm"
               />
+            </div>
+            <div className="flex-1">
+              <div className="text-gray-300 text-sm font-semibold">Stay max</div>
               <input
                 type="number"
-                value={data.stayRange.maxDays}
+                value={data.stayRange?.maxDays ?? 3}
                 onChange={(e) => updateNested('stayRange.maxDays', Number(e.target.value))}
-                className="flex-1 p-2 rounded-md text-black"
+                className="w-full p-1 rounded-md text-black text-sm"
               />
             </div>
           </div>
 
-          <div className="flex-1">
-            <label className="text-sm block">Arrive before (days)</label>
-            <div className="flex gap-2 mt-1">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <div className="text-gray-300 text-sm font-semibold">Arrive before min</div>
               <input
                 type="number"
-                value={data.arriveBeforeDays.min}
+                value={data.arriveBeforeDays?.min ?? 0}
                 onChange={(e) => updateNested('arriveBeforeDays.min', Number(e.target.value))}
-                className="flex-1 p-2 rounded-md text-black"
+                className="w-full p-1 rounded-md text-black text-sm"
               />
+            </div>
+            <div className="flex-1">
+              <div className="text-gray-300 text-sm font-semibold">Arrive before max</div>
               <input
                 type="number"
-                value={data.arriveBeforeDays.max}
+                value={data.arriveBeforeDays?.max ?? 1}
                 onChange={(e) => updateNested('arriveBeforeDays.max', Number(e.target.value))}
-                className="flex-1 p-2 rounded-md text-black"
+                className="w-full p-1 rounded-md text-black text-sm"
               />
             </div>
           </div>
         </div>
 
-        {error && <div className="text-red-300 mb-3">{error}</div>}
+        {error && <div className="text-rose-300 mt-2 text-sm">{error}</div>}
 
-        <button
-          onClick={handleConfirm}
-          disabled={saving}
-          className={`mt-2 px-4 py-2 rounded-md text-white ${saving ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600'}`}
-        >
-          {saving ? 'Saving...' : 'Confirm'}
-        </button>
+        <div className="mt-3 flex justify-center">
+          <button
+            onClick={handleConfirm}
+            disabled={saving}
+            className={`px-4 py-1 rounded-full text-white text-sm ${saving ? 'bg-gray-500 cursor-not-allowed' : 'bg-[#8D0101]'}`}
+          >
+            {saving ? 'Saving...' : 'Confirm'}
+          </button>
+        </div>
       </div>
     </div>
   );

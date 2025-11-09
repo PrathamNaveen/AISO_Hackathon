@@ -48,7 +48,7 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
       const payload = { meetingId, candidateId: candidate.id };
       const booking = await createBooking(payload);
       setBookingResult(booking);
-      push({ id: uid('a_'), role: 'agent', text: `Booking created: ${booking.confirmationNumber ?? booking.bookingId}` });
+      push({ id: uid('a_'), role: 'agent', text: `` });
       setSelected(null);
     } catch (err: any) {
       setError(String(err));
@@ -67,7 +67,7 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
         {messages.map((m) => (
           <div key={m.id} className="flex flex-col gap-2">
             <div className={`${m.role === 'user' ? 'self-end' : 'self-start'} max-w-[80%]`}>
-              <div className={`${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-black'} p-3 rounded-lg whitespace-pre-wrap`}>
+              <div className={`${m.role === 'user' ? 'bg-[#8D0101] text-white' : 'bg-gray-100 text-black'} p-3 rounded-lg whitespace-pre-wrap`}>
                 <div>{m.text}</div>
               </div>
             </div>
@@ -82,7 +82,7 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
                     <div className="mt-3 flex gap-2">
                       <button
                         onClick={() => setSelected(c)}
-                        className="px-3 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white"
+                        className="px-3 py-2 rounded-md bg-[#8D0101] hover:bg-orange-600 text-white"
                       >
                         Book this
                       </button>
@@ -100,7 +100,7 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
           <div className="font-semibold">{selected.itinerary}</div>
           <div>Price: ${selected.price?.toFixed(2)}</div>
           <div className="flex gap-2 mt-3">
-            <button onClick={() => handleConfirmBooking(selected)} className="px-3 py-2 rounded-md bg-blue-600 text-white">
+            <button onClick={() => handleConfirmBooking(selected)} className="px-3 py-2 rounded-md bg-[#8D0101] text-white">
               Confirm booking
             </button>
             <button onClick={() => setSelected(null)} className="px-3 py-2 rounded-md bg-gray-200 text-gray-800">
@@ -110,21 +110,21 @@ export default function FlightSearchPanel({ meetingId }: { meetingId: string | n
         </div>
       )}
 
-      <div className="flex gap-2 mt-3">
+      <div className="flex gap-2 mb-3 border rounded-md ">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="e.g. morning flights, business class"
           className="flex-1 p-2 rounded-md border border-gray-200"
         />
-        <button onClick={handleSend} disabled={loading} className="px-3 py-2 rounded-md bg-blue-600 text-white disabled:opacity-60">
+        <button onClick={handleSend} disabled={loading} className="  px-3 py-2 rounded-md bg-[#8D0101] text-white disabled:opacity-60">
           {loading ? 'Searching...' : 'Send'}
         </button>
       </div>
 
       {bookingResult && (
-        <div className="mt-3 bg-green-50 p-2 rounded-md text-sm">
-          <div>Booking result: {JSON.stringify(bookingResult)}</div>
+        <div className="mt-3 bg-green-300 text-center p-2 rounded-md font-semibold text-[30px]">
+          <div>Booking Created</div>
         </div>
       )}
 
