@@ -10,9 +10,12 @@ import traceback
 import uuid
 from pathlib import Path
 from typing import Tuple
+from db import fetch_parsed_invitations_from_db
 
 from db import get_db_connection
 from dotenv import load_dotenv
+from agent import run_flight_finder_agent_with_preferences
+
 
 app = FastAPI()
 
@@ -199,7 +202,45 @@ def confirm_essential(meeting_id: str, payload: Dict[str, Any], background_tasks
     task_id = _rand("task_")
     return {"taskId": task_id, "meetingId": meeting_id, "status": "accepted", "message": "Essential info updated"}
 
+@app.get("/api/invitations")
+def get_invitations(user_id: str):
+    """
+    Fetch all parsed invitations for a given user from the database.
+    """
+    try:
+        invitations = fetch_parsed_invitations_from_db(user_id)
+        # Transform to frontend-friendly structure
+        formatted = [
+            {
+                "id": inv.get("emailid"),
+                "title": inv.get("header"),
+                "location": inv.get("location", "Amsterdam"),
+                "start": inv.get("event_time", ""),
+            }
+            for inv in invitations
+        ]
+        return formatted
+    except Exception as e:
+        return {"error": str(e)}
 
+class UserPreferences(BaseModel):
+    departure_airport: str
+    arrival_airport: str
+    date: str
+    days: int = 10
+    currency: str = "USD"
+    budget: float = 9999
+
+
+@app.post("/api/preferences")
+async def set_user_preferences(preferences: UserPreferences):
+    try:
+        pref_dict = preferences.dict()
+        result = run_flight_finder_agent_with_preferences(pref_dict)
+        return {"status": "success", "data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @app.post("/api/flights/search")
 def flights_search(body: Dict[str, Any]):
     """Search flights. Try to call agent.fetch_flight_data_wrapper if available,
@@ -368,5 +409,3 @@ def login(req: LoginRequest, response: Response):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     return {"message": "Login successful", "user": {"userid": user["userid"], "email": user["email"], "name": user["name"]}}
-
-    }

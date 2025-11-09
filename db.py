@@ -78,3 +78,33 @@ def insert_email(sender: str, header: str, body: str, date=None):
     finally:
         cur.close()
         conn.close()
+
+def fetch_parsed_invitations_from_db(user_email: str):
+    """
+    Return all invitations for the given user from parsed emails table.
+    """
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        query = """
+            SELECT *
+            FROM emails
+            WHERE userid = 3 AND is_invitation = true;
+        """
+        cur.execute(query)
+        rows = cur.fetchall()
+        print(rows)
+        cur.close()
+        conn.close()
+        return [
+            {"emailid": r[0], "sender": r[1], "header": r[2], "body": r[3]}
+            for r in rows
+        ]
+    except Exception as e:
+        print(f"❌ Failed to fetch parsed emails: {e}") 
+        return []
+
+    finally:
+        cur.close()
+        conn.close()
