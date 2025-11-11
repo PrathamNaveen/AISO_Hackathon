@@ -1,4 +1,4 @@
-// src/components/EventsList.tsx
+"use client";
 import React, { useEffect, useState } from 'react';
 import type { EventItem } from '../types/api';
 
@@ -11,8 +11,9 @@ export default function EventsList({ onSelect }: EventsListProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const userId = '3';
   const BASE_URL = "http://localhost:8000";
+  const userId = localStorage.getItem('userId');
+  console.log(userId);
 
   useEffect(() => {
     let mounted = true;
@@ -20,7 +21,7 @@ export default function EventsList({ onSelect }: EventsListProps) {
     const fetchEvents = async () => {
       try {
         // Fixed: removed extra backtick and userId literal
-        const res = await fetch(`${BASE_URL}/api/invitations?user_id=${userId}`);
+        const res = await fetch(`${BASE_URL}/api/invitations/${userId}`);
         
         if (!res.ok) {
           throw new Error(`Failed to fetch invitations: ${res.statusText}`);

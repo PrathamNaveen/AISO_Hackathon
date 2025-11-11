@@ -55,23 +55,32 @@ def write_parsed_email_to_db(emailid: int, parsed_data: dict):
         cur.close()
         conn.close()
 
-def insert_email(sender: str, header: str, body: str, date=None):
+def insert_email(sender: str, header: str, body: str, user_email: str):
     """
-    Inserts a new email into the emails table.
-    Optionally, you could store the date if you add a column later.
+    Inserts a new email into the emails table for the currently logged-in user.
     """
     conn = get_db_connection()
     cur = conn.cursor()
     try:
+        # Fetch the user's ID based on their email
+        cur.execute("SELECT userid FROM users WHERE email = %s;", (user_email,))
+        user = cur.fetchone()
+
+        if not user:
+            raise ValueError(f"User with email {user_email} not found.")
+        
+        userid = user[0]
+
+        # Insert the new email linked to that user
         query = """
             INSERT INTO emails (sender, header, body, userid)
-            VALUES (%s, %s, %s, 3)
+            VALUES (%s, %s, %s, %s)
             RETURNING emailid;
         """
-        cur.execute(query, (sender, header, body))
+        cur.execute(query, (sender, header, body, userid))
         emailid = cur.fetchone()[0]
         conn.commit()
-        print(f"✅ Email stored with ID: {emailid}")
+        print(f"✅ Email stored for user {user_email} with ID: {emailid}")
         return emailid
     except Exception as e:
         print(f"❌ Failed to insert email: {e}")
@@ -79,7 +88,7 @@ def insert_email(sender: str, header: str, body: str, date=None):
         cur.close()
         conn.close()
 
-def fetch_parsed_invitations_from_db(user_email: str):
+def fetch_parsed_invitations_from_db(userid: str):
     """
     Return all invitations for the given user from parsed emails table.
     """
@@ -87,12 +96,9 @@ def fetch_parsed_invitations_from_db(user_email: str):
     cur = conn.cursor()
 
     try:
-        query = """
-            SELECT *
-            FROM emails
-            WHERE userid = 3 AND is_invitation = true;
-        """
-        cur.execute(query)
+        query = "SELECT * FROM emails WHERE userid = %s and is_invitation"
+        print("QUERY EXECUTED")
+        cur.execute(query, (userid,))
         rows = cur.fetchall()
         print(rows)
         cur.close()

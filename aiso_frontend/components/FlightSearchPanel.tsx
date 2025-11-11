@@ -1,4 +1,4 @@
-// components/FlightSearchPanel.tsx
+"use client";
 import React, { useState } from 'react';
 import { postFlightSearch, createBooking } from '../lib/api';
 import type { FlightCandidate } from '../types/api';

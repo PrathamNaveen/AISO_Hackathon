@@ -49,7 +49,9 @@ def process_new_message(service, msg_id):
 
         print(f"📬 New Email from {sender}: {subject}")
 
-        insert_email(sender, subject, body, date)
+        user_email = "prathamnaveen.m@gmail.com"
+
+        insert_email(sender, subject, body, user_email)
         print("✅ Stored in PostgreSQL")
 
     except Exception as e:

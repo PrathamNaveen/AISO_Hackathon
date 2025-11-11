@@ -68,6 +68,50 @@ class BookingRequest(BaseModel):
 def read_root():
     return {"message": "Hello, AISO!"}
 
+# AUTH APIs
+
+class SignupRequest(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+@app.post("/api/auth/signup")
+def signup(req: SignupRequest, response: Response):
+    existing_user = get_user_by_email(req.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists")
+
+    user_id = create_user(req.email, req.name, req.password)
+    return {
+        "message": "Signup successful",
+        "user": {
+            "userid": user_id,
+            "email": req.email,
+            "name": req.name,
+        },
+    }
+
+@app.post("/api/auth/login")
+def login(req: LoginRequest, response: Response):
+    user = get_user_by_email(req.email)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    return {
+        "message": "Login successful",
+        "user": {
+            "userid": user["userid"],
+            "email": user["email"],
+            "name": user["name"]
+        },
+    }
+
+
 
 def _lazy_import_agent():
     """Lazy import of the agent module. Returns module or raises ImportError.
@@ -202,7 +246,7 @@ def confirm_essential(meeting_id: str, payload: Dict[str, Any], background_tasks
     task_id = _rand("task_")
     return {"taskId": task_id, "meetingId": meeting_id, "status": "accepted", "message": "Essential info updated"}
 
-@app.get("/api/invitations")
+@app.get("/api/invitations/{user_id}")
 def get_invitations(user_id: str):
     """
     Fetch all parsed invitations for a given user from the database.
@@ -364,7 +408,7 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
-def get_user_by_email(email: str = 'dummy@gmail.com'):
+def get_user_by_email(email: str):
     conn = get_db_connection()
     cur = conn.cursor()
     try:

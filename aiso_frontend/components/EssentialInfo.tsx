@@ -1,4 +1,4 @@
-// src/components/EssentialInfo.tsx
+"use client";
 import React, { useEffect, useState } from 'react';
 import type { EssentialInfo } from '../types/api';
 import { fetchEssential } from '../lib/api';
@@ -199,13 +199,13 @@ export default function EssentialInfo({
             {saving ? 'Saving...' : 'Confirm'}
           </button>
         </div>
-
+{/* 
         {result && (
           <div className="mt-4 bg-white/10 p-2 rounded text-sm text-gray-100">
             <div className="font-semibold mb-1">Backend Response:</div>
             <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(result, null, 2)}</pre>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

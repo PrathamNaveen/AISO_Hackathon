@@ -1,0 +1,91 @@
+"use client";
+import React, { useState } from "react";
+import AuthCard from "../components/AuthCard";
+
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) throw new Error("Invalid credentials");
+      const data = await res.json();
+
+      localStorage.setItem('userId', data.user.userid);
+      window.location.href = "/dashboard";
+
+      // window.location.href = "/dashboard";
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleAuth() {
+    window.location.href = `${BASE_URL}/api/auth/google`; // backend OAuth redirect
+  }
+
+  return (
+    <AuthCard title="Welcome Back">
+      <form onSubmit={handleLogin} className="space-y-4">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          className="w-full p-3 rounded-md bg-[#2a2a2a] text-white border border-gray-700 focus:border-[#8D0101]"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="w-full p-3 rounded-md bg-[#2a2a2a] text-white border border-gray-700 focus:border-[#8D0101]"
+          required
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#8D0101] hover:bg-[#a81212] text-white p-3 rounded-md transition-colors"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGoogleAuth}
+          className="w-full bg-white text-black p-3 rounded-md hover:bg-gray-200 flex justify-center gap-2"
+        >
+          <img src="/google.svg" alt="Google" className="w-5 h-5" />
+          Sign in with Google
+        </button>
+
+        {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+      </form>
+
+      <div className="text-gray-400 text-sm text-center mt-6">
+        Don’t have an account?{" "}
+        <a href="/signup" className="text-[#8D0101] hover:underline">
+          Sign up
+        </a>
+      </div>
+    </AuthCard>
+  );
+}

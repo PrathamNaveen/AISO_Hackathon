@@ -12,6 +12,11 @@ export default function DashboardPage() {
   const [essentialOpen, setEssentialOpen] = useState<boolean>(false); // collapsed by default
   const [leftOpen, setLeftOpen] = useState<boolean>(true); // left column collapsecollapsed by default
 
+  function hangleLogout() {
+    localStorage.removeItem('userId');
+    window.location.href = "/";
+  }
+
   return (
     <div className="flex h-screen">
       <div className={`relative bg-[#222] text-white flex flex-col overflow-hidden transition-all duration-200 ${leftOpen ? 'w-80' : 'w-16'}`}>
@@ -33,7 +38,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="p-3">
-          <button className="w-full px-3 py-2 rounded-xl bg-[#444] text-white">Log out</button>
+          <button className="w-full px-3 py-2 rounded-xl bg-[#444] text-white" onClick={hangleLogout}>Log out</button>
         </div>
       </div>
 

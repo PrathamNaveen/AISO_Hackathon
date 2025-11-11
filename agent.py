@@ -38,7 +38,7 @@ def fetch_flight_data_wrapper(preferences: dict):
 
     # ---- Default preferences ----
     default_preferences = {
-        "departure_airport": "BUD",
+        "departure_airport": "AMS",
         "arrival_airport": "LIN",
         "date": "2025-12-25",
         "days": 10,
@@ -48,7 +48,7 @@ def fetch_flight_data_wrapper(preferences: dict):
     }
 
     # ---- Merge user preferences ----
-    merged = {**(preferences or {})}
+    merged = {**(default_preferences or {})}
 
     # Convert date properly
     try:
@@ -217,8 +217,6 @@ Email content:
             print(f"⚠️ LLM returned invalid JSON for email {email.get('emailid')}, skipping.")
         except Exception as e:
             print(f"⚠️ Error processing email {email.get('emailid')}: {e}")
-
-    print(parsed_invitations[:3])
 
     print(f"✅ Completed parsing. Total invitations parsed: {len(parsed_invitations)}")
     return {"parsed_invitations": parsed_invitations}

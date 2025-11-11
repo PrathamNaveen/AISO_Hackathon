@@ -1,16 +1,14 @@
 -- ===========================================
--- Flight Assistant Database Setup
+-- 🛫 Flight Assistant Database Setup
 -- ===========================================
 
--- 1️⃣ Create database
--- (Skip this if you already created it via CLI)
+DROP DATABASE IF EXISTS flight_assistant;
 CREATE DATABASE flight_assistant;
 
--- Connect to the database
-\c flight_assistant
+\c flight_assistant;
 
 -- ===========================================
--- 2️⃣ Create Tables
+-- 1️⃣ Create Tables
 -- ===========================================
 
 -- USERS TABLE
@@ -30,7 +28,8 @@ CREATE TABLE IF NOT EXISTS emails (
     userid INTEGER REFERENCES users(userid) ON DELETE CASCADE,
     sender VARCHAR(150) NOT NULL,
     header VARCHAR(255),
-    body TEXT
+    body TEXT,
+    is_invitation BOOLEAN DEFAULT FALSE
 );
 
 -- SESSIONS TABLE
@@ -55,83 +54,52 @@ CREATE TABLE IF NOT EXISTS flights (
 );
 
 -- ===========================================
--- 3️⃣ Insert Dummy Data
+-- 2️⃣ Insert Example Users
 -- ===========================================
-
--- Users
-INSERT INTO users (name, password, userid, email, sessionids, bookings)
-VALUES 
-('Pratham', 'hashed_pwd_123', 1,'pratham@example.com', ARRAY[1,2], 2)
-ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO users (name, password, email, sessionids, bookings)
 VALUES 
-('Aisha', 'hashed_pwd_456', 2, 'aisha@example.com', ARRAY[3], 1)
+('Pratham Naveen', 'hashed_pwd_123', 'prathamnaveen.m@gmail.com', ARRAY[1,2], 2),
+('Aisha Khan', 'hashed_pwd_456', 'aisha@example.com', ARRAY[3], 1),
+('Fly Giraffe Bot', 'hashed_pwd_789', 'bot@flygiraffe.ai', NULL, 0)
 ON CONFLICT (email) DO NOTHING;
 
--- Emails
-INSERT INTO emails (sender, header, body)
-VALUES
-('bot@flightai.com', 'Meeting Invitation - Amsterdam', 'Hey Pratham, join us for a meeting in Amsterdam next week!')
-ON CONFLICT DO NOTHING;
+-- ===========================================
+-- 3️⃣ Insert Example Emails
+-- ===========================================
 
-INSERT INTO emails (sender, header, body)
+INSERT INTO emails (userid, sender, header, body, is_invitation)
 VALUES
-('bot@flightai.com', 'Meeting Confirmation - Delhi', 'Aisha, your session meeting in Delhi is confirmed.')
-ON CONFLICT DO NOTHING;
+(1, 'meetings@prosus.com', 'Business Meeting - Amsterdam', 'Hi Pratham, your meeting in Amsterdam is confirmed for next week.', TRUE),
+(1, 'events@netapp.com', 'Tech Conference Invite - Berlin', 'Dear Pratham, you’re invited to the AI Tech Conference in Berlin.', TRUE),
+(2, 'bot@flightai.com', 'Session Confirmation - Delhi', 'Aisha, your internal meeting in Delhi is confirmed.', TRUE),
+(3, 'system@flygiraffe.ai', 'Flight Recommendation Update', 'Your latest flight options are ready.', FALSE);
 
--- Flights
-INSERT INTO flights (userid, departure, arrival, currency, price, airline)
-VALUES
-(1, 'DEL', 'AMS', 'EUR', 480.00, 'KLM Royal Dutch');
-
-INSERT INTO flights (userid, departure, arrival, currency, price, airline)
-VALUES
-(1, 'AMS', 'DEL', 'EUR', 470.00, 'Emirates');
+-- ===========================================
+-- 4️⃣ Insert Example Flights
+-- ===========================================
 
 INSERT INTO flights (userid, departure, arrival, currency, price, airline)
 VALUES
+(1, 'DEL', 'AMS', 'EUR', 480.00, 'KLM Royal Dutch'),
+(1, 'AMS', 'BER', 'EUR', 150.00, 'EasyJet'),
 (2, 'DEL', 'BOM', 'INR', 120.00, 'IndiGo');
 
--- Sessions
-INSERT INTO sessions (userid, emailid, session_duration, context_window_length, user_preferences)
-VALUES
-(1, 1, INTERVAL '30 minutes', 5, '{"preferred_airlines": ["KLM", "Emirates"], "budget": 500, "class": "Economy"}');
-
-INSERT INTO sessions (userid, emailid, session_duration, context_window_length, user_preferences)
-VALUES
-(1, 1, INTERVAL '45 minutes', 6, '{"preferred_airlines": ["Emirates"], "budget": 600, "class": "Business"}');
-
-INSERT INTO sessions (userid, emailid, session_duration, context_window_length, user_preferences)
-VALUES
-(2, 2, INTERVAL '25 minutes', 4, '{"preferred_airlines": ["IndiGo"], "budget": 200, "class": "Economy"}');
-
 -- ===========================================
--- 4️⃣ Select Queries to Verify
+-- 5️⃣ Insert Example Sessions
 -- ===========================================
 
--- List all users
+INSERT INTO sessions (userid, emailid, session_duration, context_window_length, user_preferences)
+VALUES
+(1, 1, INTERVAL '30 minutes', 5, '{"preferred_airlines": ["KLM", "Emirates"], "budget": 500, "class": "Economy"}'),
+(1, 2, INTERVAL '45 minutes', 6, '{"preferred_airlines": ["EasyJet"], "budget": 300, "class": "Economy"}'),
+(2, 3, INTERVAL '25 minutes', 4, '{"preferred_airlines": ["IndiGo"], "budget": 200, "class": "Economy"}');
+
+-- ===========================================
+-- 6️⃣ Verify Data
+-- ===========================================
+
 SELECT * FROM users;
-
--- List all emails
 SELECT * FROM emails;
-
--- List all flights
 SELECT * FROM flights;
-
--- List all sessions
 SELECT * FROM sessions;
-
-------------------------------------------------------------------------------------------------------------------------------------
-
--- Join example: user sessions with emails and flights
-ALTER TABLE emails
-ADD COLUMN is_invitation BOOLEAN DEFAULT FALSE;
-
--- Example: marking an email as an invitation
-UPDATE emails
-SET is_invitation = TRUE
-WHERE emailid = 3;
-
-SELECT * FROM emails
-WHERE is_invitation = TRUE;

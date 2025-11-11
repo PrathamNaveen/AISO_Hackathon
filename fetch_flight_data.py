@@ -93,6 +93,8 @@ def fetch_flight_data_from_serpapi(
         "sort_by": sort_by,
     }
 
+    print(params)
+
     print(f"🔍 Fetching flights {departure_id} → {arrival_id} ({outbound_date} → {return_date})...")
 
     # Perform the API request
